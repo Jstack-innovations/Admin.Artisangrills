@@ -1,0 +1,97 @@
+/* AdminLogin.css */
+.admin-login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #1a120b, #0f0a08);
+  font-family: Inter, sans-serif;
+  color: #f3eadf;
+}
+
+.admin-login-wrapper .login-box {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 238, 215, 0.15);
+  border-radius: 22px;
+  padding: 26px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.admin-login-wrapper .brand {
+  text-align: center;
+  font-family: Sacramento, cursive;
+  font-size: 34px;
+  margin-bottom: 18px;
+}
+
+.admin-login-wrapper .brand span {
+  color: #d6a86a;
+}
+
+.admin-login-wrapper label {
+  font-size: 13px;
+  color: #cbbba8;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.admin-login-wrapper input {
+  width: 95%;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 238, 215, 0.15);
+  background: rgba(0, 0, 0, 0.35);
+  color: #f3eadf;
+  outline: none;
+  margin-bottom: 14px;
+}
+
+.admin-login-wrapper button {
+  width: 95%;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 238, 215, 0.15);
+  background: linear-gradient(180deg, #2b1a13, #3a231a);
+  color: #f3eadf;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-login-wrapper .error {
+  background: rgba(255, 0, 0, 0.12);
+  border: 1px solid rgba(255, 0, 0, 0.25);
+  color: #ffb3b3;
+  padding: 10px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.admin-login-wrapper .test-box {
+  margin-top: 24px;
+  border-top: 1px solid rgba(255, 238, 215, 0.15);
+  padding-top: 18px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.admin-login-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-login-wrapper th,
+.admin-login-wrapper td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255, 238, 215, 0.15);
+  color: #cbbba8;
+}
+
+.admin-login-wrapper th {
+  color: #d6a86a;
+  text-align: left;
+}
