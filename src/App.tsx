@@ -140,6 +140,7 @@ export default function PaidOrders() {
         <a href="/">All Orders</a>
         <a href="/users">Active Users</a>
         <a href="/tables">Available Tables</a>
+        <Link to="/tables">Available Tables</Link>
         <a href="/menu">Add Menu</a>
         <a href="/tax">Set Tax</a>
         <a href="/check-reservations">View Reservations</a>
