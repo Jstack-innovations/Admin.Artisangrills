@@ -314,7 +314,7 @@ export default function MenuPage() {
               }}
             />
           </div>
-          <div className="form-row">
+          <div className="form-rowT">
             <select
               value={item.available ? "1" : "0"}
               onChange={(e) => {
