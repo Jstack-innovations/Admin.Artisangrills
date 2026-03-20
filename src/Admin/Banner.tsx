@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./Css/Banner.css";
 import { API_BASE } from "../Config/api";
 
-const GET_URL = `${API_BASE}/GET/CORS/BannerJson.php`;
-const SAVE_URL = `${API_BASE}/admins/POST/save_banner.php`;
+const GET_URL = `${API_BASE}/banner`;
+const SAVE_URL = `${API_BASE}/adminBanner`;
 
 type Banner = {
   address: string;
@@ -22,7 +22,7 @@ export default function BannerAdmin() {
     const checkSession = async () => {
       try {
         const res = await fetch(
-          `${API_BASE}/admins/GET/check_session.php`,
+          `${API_BASE}/checkSession`,
           { credentials: "include" }
         );
         const data = await res.json();
