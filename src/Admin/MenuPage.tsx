@@ -214,7 +214,7 @@ export default function MenuPage() {
               />
             </div>
 
-            <div className="form-row">
+            <div className="form-rowT">
               <input
                 placeholder="Description"
                 value={form.description}
