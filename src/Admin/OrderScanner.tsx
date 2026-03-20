@@ -3,25 +3,36 @@ import "./Css/OrderScanner.css";
 import { API_BASE } from "../Config/api";
 import { Html5Qrcode } from "html5-qrcode";
 
-export default function OrderScanner() {
-  const [plate, setPlate] = useState("");
-  const [order, setOrder] = useState(null);
-  const [status, setStatus] = useState("");
-  const [showModal, setShowModal] = useState(false);
+type Order = {
+  name: string;
+  phone: string;
+  total_amount: string;
+  order_status: string;
+};
 
-  // START CAMERA
+export default function OrderScanner() {
+  const [plate, setPlate] = useState<string>("");
+  const [order, setOrder] = useState<Order | null>(null);
+  const [status, setStatus] = useState<string>("");
+  const [showModal, setShowModal] = useState<boolean>(false);
+
   useEffect(() => {
     const qr = new Html5Qrcode("reader");
 
     Html5Qrcode.getCameras().then((cams) => {
-      let cam = cams.find(c => /back|rear/i.test(c.label)) || cams[0];
+      if (!cams.length) return;
+
+      const cam =
+        cams.find((c) => /back|rear/i.test(c.label)) || cams[0];
 
       qr.start(
         cam.id,
-        { fps: 10, qrbox: 250 },
+        {
+          fps: 10,
+          qrbox: 250,
+        },
         (msg) => {
-          // ✅ FIXED: extract plate from your QR format
-          let match = msg.match(/Plate:\s*(.+)/);
+          const match = msg.match(/Plate:\s*(.+)/);
 
           if (!match) {
             alert("Invalid QR Code");
@@ -38,17 +49,20 @@ export default function OrderScanner() {
       );
     });
 
+    // cleanup
+    return () => {
+      try {
+        qr.stop();
+        qr.clear();
+      } catch (e) {}
+    };
   }, []);
 
-  // FETCH ORDER
-  const fetchOrder = async (plate) => {
-    const res = await fetch(`${API_BASE}/admins/GET/fetch_order.php`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: `tracking_number=${plate}`,
-    });
+  // FIXED: GET request with query param (NO BODY)
+  const fetchOrder = async (plate: string) => {
+    const res = await fetch(
+      `${API_BASE}/admins/GET/fetch_order.php?tracking_number=${plate}`
+    );
 
     const data = await res.json();
 
@@ -62,7 +76,6 @@ export default function OrderScanner() {
     setStatus(data.order_status);
   };
 
-  // UPDATE STATUS
   const updateStatus = async () => {
     await fetch(`${API_BASE}/admins/PUT/update_order_status.php`, {
       method: "PUT",
@@ -92,7 +105,10 @@ export default function OrderScanner() {
             <p><b>Total:</b> ₦{order.total_amount}</p>
             <p><b>Status:</b> {order.order_status}</p>
 
-            <select value={status} onChange={(e) => setStatus(e.target.value)}>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
               <option>Order placed</option>
               <option>Cooking</option>
               <option>Cooking done</option>
@@ -105,7 +121,9 @@ export default function OrderScanner() {
             <p>Plate: {plate}</p>
 
             <button onClick={updateStatus}>Update Status</button>
-            <button onClick={() => window.location.reload()}>Cancel</button>
+            <button onClick={() => window.location.reload()}>
+              Cancel
+            </button>
           </div>
         </div>
       )}
