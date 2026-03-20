@@ -9,7 +9,7 @@ export default function Logout() {
     const doLogout = async () => {
       try {
         await fetch(
-        `${API_BASE}/admins/POST/logout.php`,
+        `${API_BASE}/adminLogout`,
           {
             method: "POST",
             credentials: "include", // important to send session cookies
