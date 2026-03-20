@@ -17,7 +17,6 @@ import AdminUsers from "./Admin/AdminUsers.tsx";
 import OrderScanner from "./Admin/OrderScanner.tsx";
 import Offers from "./Admin/Offers.tsx";
 import Banner from "./Admin/Banner.tsx";
-import { useParams } from "react-router-dom"
 
 const root = document.getElementById("root");
 
@@ -26,13 +25,12 @@ if (root) {
     <StrictMode>
       <BrowserRouter>
         <Routes>
-          
+
           <Route path="/" element={<App />} />
-          {/* ⭐ EditOrder route with param */}
-          <Route
-            path="/edit-order/:id"
-            element={<EditOrderWrapper />}
-          />
+
+          {/* FIXED: no wrapper needed */}
+          <Route path="/edit-order/:id" element={<EditOrder />} />
+
           <Route path="/add-order" element={<AddOrder />} />
           <Route path="/tables" element={<Tables />} />
           <Route path="/tax" element={<Tax />} />
@@ -44,15 +42,9 @@ if (root) {
           <Route path="/scanner" element={<OrderScanner />} />
           <Route path="/offers" element={<Offers />} />
           <Route path="/banners" element={<Banner />} />
-          
+
         </Routes>
       </BrowserRouter>
     </StrictMode>
   );
-}
-
-// ⭐ Wrapper to extract ID param and pass to EditOrder
-function EditOrderWrapper() {
-  const { id } = useParams<{ id: string }>();
-  return id ? <EditOrder id={id} /> : <div>Invalid order ID</div>;
-}
+          }
