@@ -25,7 +25,7 @@ export default function EditOrder() {
     const checkSession = async () => {
       try {
         const res = await fetch(
-          `${API_BASE}/admins/GET/check_session.php`,
+          `${API_BASE}/checkSession`,
           { credentials: "include" }
         );
         const data = await res.json();
@@ -45,7 +45,7 @@ export default function EditOrder() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${API_BASE}/admins/PUT/edit_order.php?id=${id}`)
+    fetch(`${API_BASE}/adminEditOrder?id=${id}`)
       .then(res => res.json())
       .then(data => {
         setOrder(data);
@@ -65,7 +65,7 @@ export default function EditOrder() {
     e.preventDefault();
     if (!order || !id) return;
 
-    await fetch(`${API_BASE}/admins/PUT/edit_order.php?id=${id}`, {
+    await fetch(`${API_BASE}/adminEditOrder?id=${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(order),
