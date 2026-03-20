@@ -35,7 +35,7 @@ export default function MenuPage() {
   const checkSession = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/admins/GET/check_session.php`,
+        `${API_BASE}/checkSession`,
         { credentials: "include" } // include cookies
       );
       const data = await res.json();
@@ -54,7 +54,7 @@ export default function MenuPage() {
 
   const fetchMenu = async () => {
     const res = await fetch(
-        `${API_BASE}/admins/GET/get_menu.php`
+        `${API_BASE}/getMenu`
     );
     const data = await res.json();
     setMenu(data.menu);
@@ -67,7 +67,7 @@ export default function MenuPage() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     await fetch(
-        `${API_BASE}/admins/PUT/update_menu.php`,
+        `${API_BASE}/adminUpdateMenu`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -89,7 +89,7 @@ export default function MenuPage() {
 
   const handleUpdate = async (category: string, item: MenuItem) => {
     await fetch(
-        `${API_BASE}/admins/PUT/update_menu.php`,
+        `${API_BASE}/adminUpdateMenu`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -112,7 +112,7 @@ export default function MenuPage() {
 
   const handleDelete = async (category: string, id: number) => {
     await fetch(
-        `${API_BASE}/admins/PUT/update_menu.php`,
+        `${API_BASE}/adminUpdateMemu`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
