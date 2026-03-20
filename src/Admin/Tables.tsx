@@ -11,53 +11,78 @@ type Table = {
   image: string;
   booked: number;
   booked_id: number | null;
+  amount: number;
 };
 
 export default function Tables() {
   const navigate = useNavigate();
   const [tables, setTables] = useState<Table[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
-  
+
   useEffect(() => {
-  const checkSession = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/checkSession`,
-        { credentials: "include" } // include cookies
-      );
-      const data = await res.json();
+    const checkSession = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/checkSession`, {
+          credentials: "include",
+        });
+        const data = await res.json();
 
-      if (!data.loggedIn) {
-        navigate("/login"); // redirect to login if no session
+        if (!data.loggedIn) {
+          navigate("/login");
+        }
+      } catch (err) {
+        console.error("Session check failed:", err);
+        navigate("/login");
       }
-    } catch (err) {
-      console.error("Session check failed:", err);
-      navigate("/login");
-    }
-  };
+    };
 
-  checkSession();
-}, [navigate]);
+    checkSession();
+  }, [navigate]);
 
+  // ✅ FIXED: supports FLOORS response
   const fetchTables = async () => {
-    const res = await fetch(        `${API_BASE}/getTable`);
+    const res = await fetch(`${API_BASE}/getTable`);
     const data = await res.json();
-    setTables(data.tables);
+
+    const allTables = Object.values(data.floors || {}).flat();
+
+    setTables(allTables as Table[]);
   };
 
   useEffect(() => {
     fetchTables();
   }, []);
 
-  const handleUpdate = async (table: Table, booked: number) => {
-  // Optimistically update UI
-  setTables(prev =>
-    prev.map(t => t.id === table.id ? { ...t, booked } : t)
-  );
+  // ✅ UPDATE TABLE (INCLUDING AMOUNT)
+  const handleTableEdit = async (table: Table) => {
+    const res = await fetch(`${API_BASE}/adminUpdateTable`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "edit",
+        id: table.id,
+        number: table.number,
+        seats: table.seats,
+        description: table.description,
+        image: table.image,
+        amount: table.amount,
+      }),
+    });
 
-  const res = await fetch(
-        `${API_BASE}/adminUpdateTable`,
-    {
+    const data = await res.json();
+
+    if (!data.success) {
+      alert("Update failed: " + data.error);
+      fetchTables();
+    }
+  };
+
+  const handleUpdate = async (table: Table, booked: number) => {
+    setTables((prev) =>
+      prev.map((t) => (t.id === table.id ? { ...t, booked } : t))
+    );
+
+    const res = await fetch(`${API_BASE}/adminUpdateTable`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -66,26 +91,35 @@ export default function Tables() {
         action: "update",
         booked,
       }),
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert("Update failed: " + data.error);
+      setTables((prev) =>
+        prev.map((t) =>
+          t.id === table.id ? { ...t, booked: table.booked } : t
+        )
+      );
     }
-  );
-  const data = await res.json();
-  if (!data.success) {
-    alert("Update failed: " + data.error);
-    // Revert UI if update failed
-    setTables(prev =>
-      prev.map(t => t.id === table.id ? { ...t, booked: table.booked } : t)
-    );
-  }
-};
+  };
 
   const handleDelete = async (table: Table) => {
     if (!table.booked_id) return alert("Nothing to delete");
+
     const res = await fetch(`${API_BASE}/adminUpdateTable`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: table.id, booked_id: table.booked_id, action: "delete" }),
+      body: JSON.stringify({
+        id: table.id,
+        booked_id: table.booked_id,
+        action: "delete",
+      }),
     });
+
     const data = await res.json();
+
     if (data.success) fetchTables();
     else alert("Delete failed: " + data.error);
   };
@@ -94,15 +128,22 @@ export default function Tables() {
     <div>
       {/* HEADER */}
       <header>
-        <div className="brand">ARTISAN <span>GRILLS</span></div>
+        <div className="brand">
+          ARTISAN <span>GRILLS</span>
+        </div>
+
         <nav className="nav">
-        <a href="/">All Orders</a>
-        <a href="/tables">Available Tables</a>
-        <a href="/menu">Add Menu</a>
-        <a href="/tax">Set Tax</a>
-        <a href="/check-reservations">View Reservations</a>
+          <a href="/">All Orders</a>
+          <a href="/tables">Available Tables</a>
+          <a href="/menu">Add Menu</a>
+          <a href="/tax">Set Tax</a>
+          <a href="/check-reservations">View Reservations</a>
         </nav>
-        <button className={`hamburger ${menuOpen ? "active" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
+
+        <button
+          className={`hamburger ${menuOpen ? "active" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
           <span></span>
           <span></span>
           <span></span>
@@ -110,6 +151,139 @@ export default function Tables() {
       </header>
 
       {/* MOBILE MENU */}
+      <div className={`mobile-menu ${menuOpen ? "" : "hidden"}`}>
+        <a href="/">All Orders</a>
+        <a href="/tables">Available Tables</a>
+        <a href="/menu">Add Menu</a>
+        <a href="/tax">Set Tax</a>
+        <a href="/check-reservations">View Reservations</a>
+      </div>
+
+      {/* TABLE GRID */}
+      <div className="wrapper">
+        <div className="table-grid">
+          {tables.map((table) => (
+            <div className="card" key={table.id}>
+              <img src={table.image} alt={`Table ${table.number}`} />
+
+              <h3>
+                Table {table.number} • {table.seats} seats
+              </h3>
+
+              <p>{table.description}</p>
+
+              <p>
+                <strong>Amount:</strong> ₦{table.amount}
+              </p>
+
+              <div className={`status ${table.booked ? "booked" : "available"}`}>
+                {table.booked ? "Booked" : "Available"}
+              </div>
+
+              {/* EDIT FIELDS */}
+              <div className="form-row">
+                <input
+                  value={table.number}
+                  onChange={(e) =>
+                    setTables((prev) =>
+                      prev.map((t) =>
+                        t.id === table.id
+                          ? { ...t, number: e.target.value }
+                          : t
+                      )
+                    )
+                  }
+                />
+
+                <input
+                  type="number"
+                  value={table.seats}
+                  onChange={(e) =>
+                    setTables((prev) =>
+                      prev.map((t) =>
+                        t.id === table.id
+                          ? { ...t, seats: parseInt(e.target.value) }
+                          : t
+                      )
+                    )
+                  }
+                />
+              </div>
+
+              <div className="form-row">
+                <input
+                  value={table.image}
+                  onChange={(e) =>
+                    setTables((prev) =>
+                      prev.map((t) =>
+                        t.id === table.id
+                          ? { ...t, image: e.target.value }
+                          : t
+                      )
+                    )
+                  }
+                />
+              </div>
+
+              <div className="form-row">
+                <input
+                  value={table.description}
+                  onChange={(e) =>
+                    setTables((prev) =>
+                      prev.map((t) =>
+                        t.id === table.id
+                          ? { ...t, description: e.target.value }
+                          : t
+                      )
+                    )
+                  }
+                />
+              </div>
+
+              {/* AMOUNT EDIT */}
+              <div className="form-row">
+                <input
+                  type="number"
+                  value={table.amount}
+                  onChange={(e) =>
+                    setTables((prev) =>
+                      prev.map((t) =>
+                        t.id === table.id
+                          ? { ...t, amount: parseFloat(e.target.value) }
+                          : t
+                      )
+                    )
+                  }
+                />
+              </div>
+
+              {/* BOOKING */}
+              <div className="form-row">
+                <select
+                  value={table.booked}
+                  onChange={(e) =>
+                    handleUpdate(table, parseInt(e.target.value))
+                  }
+                >
+                  <option value={0}>Available</option>
+                  <option value={1}>Booked</option>
+                </select>
+
+                <button className="btn" onClick={() => handleDelete(table)}>
+                  Delete
+                </button>
+              </div>
+
+              <button className="btn" onClick={() => handleTableEdit(table)}>
+                Save Changes
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+    }      {/* MOBILE MENU */}
       <div className={`mobile-menu ${menuOpen ? "" : "hidden"}`}>
         <a href="/">All Orders</a>
         <a href="/tables">Available Tables</a>
