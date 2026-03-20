@@ -50,7 +50,7 @@ export default function PaidOrders() {
     const checkSession = async () => {
       try {
         const res = await fetch(
-          `${API_BASE}/admins/GET/check_session.php`,
+          `${API_BASE}/checkSession`,
           { credentials: "include" }
         );
         const data = await res.json();
@@ -68,7 +68,7 @@ export default function PaidOrders() {
   }, [navigate]);
 
   useEffect(() => {
-    fetch(`${API_BASE}/admins/GET/orders.php`)
+    fetch(`${API_BASE}/getOrder`)
       .then((res) => res.json())
       .then((data) => {
         setOrders(Object.values(data.orders || {}));
@@ -81,7 +81,7 @@ export default function PaidOrders() {
     if (!confirm("Delete this order?")) return;
 
     const res = await fetch(
-      `${API_BASE}/admins/DELETE/delete_order.php?id=${id}`,
+      `${API_BASE}/adminDeleteOrder?id=${id}`,
       { method: "DELETE" }
     );
 
