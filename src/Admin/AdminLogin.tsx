@@ -17,7 +17,7 @@ export default function Login() {
   // Check session
   useEffect(() => {
     fetch(
-        `${API_BASE}/admins/GET/check_session.php`,
+        `${API_BASE}/checkSession`,
       { credentials:"include" }
     )
     .then(res => res.json())
@@ -30,7 +30,7 @@ export default function Login() {
   // Fetch admins
   useEffect(() => {
 
-    fetch(`${API_BASE}/admins/GET/admins.php`)
+    fetch(`${API_BASE}/admin`)
       .then(res => res.json())
       .then(data => {
         console.log("Admins fetched:",data);
@@ -50,7 +50,7 @@ export default function Login() {
     try{
 
       const res = await fetch(
-        `${API_BASE}/admins/POST/login.php`,
+        `${API_BASE}/adminLogin`,
         {
           method:"POST",
           headers:{ "Content-Type":"application/json" },
