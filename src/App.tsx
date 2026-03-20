@@ -158,6 +158,8 @@ export default function PaidOrders() {
             <p>{stats.totalPlaced}</p>
           </div>
 
+          <Link to="/tables">Available Tables</Link>
+
           <div className="card">
             <h3>Total Served Orders</h3>
             <p>{stats.totalServed}</p>
