@@ -22,7 +22,7 @@ export default function Tables() {
   const checkSession = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/admins/GET/check_session.php`,
+        `${API_BASE}/checkSession`,
         { credentials: "include" } // include cookies
       );
       const data = await res.json();
@@ -40,7 +40,7 @@ export default function Tables() {
 }, [navigate]);
 
   const fetchTables = async () => {
-    const res = await fetch(        `${API_BASE}/admins/GET/get_tables.php`);
+    const res = await fetch(        `${API_BASE}/getTable`);
     const data = await res.json();
     setTables(data.tables);
   };
@@ -56,7 +56,7 @@ export default function Tables() {
   );
 
   const res = await fetch(
-        `${API_BASE}/admins/PUT/update_table.php`,
+        `${API_BASE}/adminUpdateTable`,
     {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -80,7 +80,7 @@ export default function Tables() {
 
   const handleDelete = async (table: Table) => {
     if (!table.booked_id) return alert("Nothing to delete");
-    const res = await fetch(`${API_BASE}/admins/PUT/update_table.php`, {
+    const res = await fetch(`${API_BASE}/adminUpdateTable`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: table.id, booked_id: table.booked_id, action: "delete" }),
