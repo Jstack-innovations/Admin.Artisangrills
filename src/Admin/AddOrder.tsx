@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Css/AddOrder.css";
 import { API_BASE } from "../Config/api";
@@ -52,9 +52,16 @@ export default function AddOrder() {
 }, [navigate]);
 
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setOrder(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
+
+  setOrder(prev => ({
+    ...prev,
+    [name]: value,
+  }));
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
