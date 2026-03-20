@@ -22,7 +22,7 @@ export default function TaxPage() {
   const checkSession = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/admins/GET/check_session.php`,
+        `${API_BASE}/checkSession`,
         { credentials: "include" } // include cookies
       );
       const data = await res.json();
@@ -42,7 +42,7 @@ export default function TaxPage() {
 
   const fetchTax = async () => {
     const res = await fetch(
-        `${API_BASE}/admins/GET/get_tax.php`
+        `${API_BASE}/getTax`
     );
     const data = await res.json();
     setTax(data);
@@ -55,7 +55,7 @@ export default function TaxPage() {
   const updateTax = async () => {
 
     await fetch(
-        `${API_BASE}/admins/PUT/update_tax.php`,
+        `${API_BASE}/adminUpdateTax`,
       {
         method: "PUT",
         headers: {
@@ -76,7 +76,7 @@ export default function TaxPage() {
   const resetTax = async () => {
 
     await fetch(
-        `${API_BASE}/admins/PUT/update_tax.php`,
+        `${API_BASE}/adminUpdateTax`,
       {
         method: "PUT",
         headers: {
