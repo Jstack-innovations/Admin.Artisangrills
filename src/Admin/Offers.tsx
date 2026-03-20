@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./Css/Offers.css";
 import { API_BASE } from "../Config/api";
 
-const GET_URL = `${API_BASE}/GET/CORS/OffersJson.php`;
-const SAVE_URL = `${API_BASE}/admins/POST/save_offers.php`;
+const GET_URL = `${API_BASE}/offer`;
+const SAVE_URL = `${API_BASE}/adminOffer`;
 
 type Offer = {
   title: string;
@@ -22,7 +22,7 @@ export default function OffersAdmin() {
     const checkSession = async () => {
       try {
         const res = await fetch(
-          `${API_BASE}/admins/GET/check_session.php`,
+          `${API_BASE}/checkSession`,
           { credentials: "include" }
         );
         const data = await res.json();
