@@ -31,7 +31,7 @@ export default function ReservationsPage() {
   const checkSession = async () => {
     try {
       const res = await fetch(
-                `${API_BASE}/admins/GET/check_session.php`,
+                `${API_BASE}/checkSession`,
         { credentials: "include" } // include cookies
       );
       const data = await res.json();
@@ -52,7 +52,7 @@ export default function ReservationsPage() {
   const fetchReservations = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/admins/GET/get_reservations.php`
+        `${API_BASE}/getReservations`
       );
       const data = await res.json();
 
@@ -80,7 +80,7 @@ export default function ReservationsPage() {
   const handleUpdate = async (reservation: Reservation) => {
     try {
       await fetch(
-                `${API_BASE}/admins/PUT/update_reservations.php`,
+                `${API_BASE}/adminUpdateReservations`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -97,7 +97,7 @@ export default function ReservationsPage() {
   const handleDelete = async (id: number) => {
     try {
       await fetch(
-        `${API_BASE}/admins/PUT/update_reservations.php`,
+        `${API_BASE}/adminUpdateReservations`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
