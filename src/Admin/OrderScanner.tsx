@@ -65,7 +65,7 @@ export default function OrderScanner() {
   // FIXED: GET request with query param (NO BODY)
   const fetchOrder = async (plate: string) => {
     const res = await fetch(
-      `${API_BASE}/admins/GET/fetch_order.php?tracking_number=${plate}`
+      `${API_BASE}/fetchOrder?tracking_number=${plate}`
     );
 
     const data = await res.json();
@@ -81,7 +81,7 @@ export default function OrderScanner() {
   };
 
   const updateStatus = async () => {
-    await fetch(`${API_BASE}/admins/PUT/update_order_status.php`, {
+    await fetch(`${API_BASE}/adminUpdateOrderStatus`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
