@@ -26,27 +26,31 @@ export default function OrderScanner() {
         cams.find((c) => /back|rear/i.test(c.label)) || cams[0];
 
       qr.start(
-        cam.id,
-        {
-          fps: 10,
-          qrbox: 250,
-        },
-        (msg) => {
-          const match = msg.match(/Plate:\s*(.+)/);
+  cam.id,
+  {
+    fps: 10,
+    qrbox: { width: 250, height: 250 }
+  },
+  (msg) => {
+    const match = msg.match(/Plate:\s*(.+)/);
 
-          if (!match) {
-            alert("Invalid QR Code");
-            return;
-          }
+    if (!match) {
+      alert("Invalid QR Code");
+      return;
+    }
 
-          const scannedPlate = match[1].trim();
-          setPlate(scannedPlate);
+    const scannedPlate = match[1].trim();
+    setPlate(scannedPlate);
 
-          qr.stop();
-          setShowModal(true);
-          fetchOrder(scannedPlate);
-        }
-      );
+    qr.stop();
+    setShowModal(true);
+    fetchOrder(scannedPlate);
+  },
+  (errorMessage) => {
+    // REQUIRED for newer html5-qrcode versions
+    console.log("QR scan error:", errorMessage);
+  }
+);
     });
 
     // cleanup
