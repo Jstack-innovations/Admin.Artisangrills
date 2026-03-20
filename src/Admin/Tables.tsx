@@ -283,37 +283,4 @@ export default function Tables() {
       </div>
     </div>
   );
-    }      {/* MOBILE MENU */}
-      <div className={`mobile-menu ${menuOpen ? "" : "hidden"}`}>
-        <a href="/">All Orders</a>
-        <a href="/tables">Available Tables</a>
-        <a href="/menu">Add Menu</a>
-        <a href="/tax">Set Tax</a>
-        <a href="/check-reservations">View Reservations</a>
-      </div>
-
-      {/* TABLE GRID */}
-      <div className="wrapper">
-        <div className="table-grid">
-          {tables.map((table) => (
-            <div className="card" key={table.id}>
-              <img src={table.image} alt={`Table ${table.number}`} />
-              <h3>Table {table.number} • {table.seats} seats</h3>
-              <p>{table.description}</p>
-              <div className={`status ${table.booked ? "booked" : "available"}`}>
-  {table.booked ? "Booked" : "Available"}
-</div>
-              <div className="form-row">
-                <select value={table.booked} onChange={e => handleUpdate(table, parseInt(e.target.value))}>
-                  <option value={0}>Available</option>
-                  <option value={1}>Booked</option>
-                </select>
-                <button className="btn" onClick={() => handleDelete(table)}>Delete</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+                }
