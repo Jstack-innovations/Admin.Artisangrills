@@ -34,7 +34,7 @@ export default function AddOrder() {
   const checkSession = async () => {
     try {
       const res = await fetch(
-           `${API_BASE}/admins/GET/check_session.php`,
+           `${API_BASE}/checkSession`,
         { credentials: "include" } // include cookies
       );
       const data = await res.json();
@@ -68,7 +68,7 @@ export default function AddOrder() {
 
     try {
       const res = await fetch(
-        `${API_BASE}/admins/POST/add_order.php`,
+        `${API_BASE}/adminAddOrder`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
