@@ -14,7 +14,7 @@ useEffect(() => {
   const checkSession = async () => {
     try {
       const res = await fetch(
-             `${API_BASE}/admins/GET/check_session.php`,
+             `${API_BASE}/checkSession`,
         { credentials: "include" } // include cookies
       );
       const data = await res.json();
@@ -34,7 +34,7 @@ useEffect(() => {
 
 
 const API =
-        `${API_BASE}/admins/GET/users_and_verifications.php`;
+        `${API_BASE}/UandV`;
 
 useEffect(()=>{
 
@@ -57,7 +57,7 @@ setEditUser({...user});
 function saveEdit(){
 
 fetch(
-        `${API_BASE}/admins/PUT/update_user.php`,
+        `${API_BASE}/adminUpdateUser`,
 {
 method:"PUT",
 headers:{ "Content-Type":"application/json" },
@@ -85,7 +85,7 @@ function deleteUser(id:number){
 if(!confirm("Delete this user?")) return;
 
 fetch(
-        `${API_BASE}/admins/DELETE/delete_user.php`,
+        `${API_BASE}/adminDeleteUser`,
 {
 method:"DELETE",
 headers:{ "Content-Type":"application/json" },
