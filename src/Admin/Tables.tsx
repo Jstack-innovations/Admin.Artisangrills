@@ -258,7 +258,7 @@ export default function Tables() {
               </div>
 
               {/* BOOKING */}
-              <div className="form-row">
+              <div className="form-rowT">
                 <select
                   value={table.booked}
                   onChange={(e) =>
