@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Css/Offers.css";
 import { API_BASE } from "../Config/api";
@@ -6,34 +6,38 @@ import { API_BASE } from "../Config/api";
 const GET_URL = `${API_BASE}/GET/CORS/OffersJson.php`;
 const SAVE_URL = `${API_BASE}/admins/POST/save_offers.php`;
 
+type Offer = {
+  title: string;
+  main: string;
+  sub: string;
+  bg: string;
+  image: string;
+};
+
 export default function OffersAdmin() {
-  const [offers, setOffers] = useState([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
   const navigate = useNavigate();
-  
-  
+
   useEffect(() => {
-  const checkSession = async () => {
-    try {
-      const res = await fetch(
-             `${API_BASE}/admins/GET/check_session.php`,
-        { credentials: "include" } // include cookies
-      );
-      const data = await res.json();
+    const checkSession = async () => {
+      try {
+        const res = await fetch(
+          `${API_BASE}/admins/GET/check_session.php`,
+          { credentials: "include" }
+        );
+        const data = await res.json();
 
-      if (!data.loggedIn) {
-        navigate("/login"); // redirect to login if no session
+        if (!data.loggedIn) {
+          navigate("/login");
+        }
+      } catch (err) {
+        console.error("Session check failed:", err);
+        navigate("/login");
       }
-    } catch (err) {
-      console.error("Session check failed:", err);
-      navigate("/login");
-    }
-  };
+    };
 
-  checkSession();
-}, [navigate]);
-
-
-
+    checkSession();
+  }, [navigate]);
 
   useEffect(() => {
     fetch(GET_URL)
@@ -41,9 +45,12 @@ export default function OffersAdmin() {
       .then((data) => setOffers(data));
   }, []);
 
-  const update = (i, key, value) => {
+  const update = (i: number, key: keyof Offer, value: string) => {
     const copy = [...offers];
-    copy[i][key] = value;
+    copy[i] = {
+      ...copy[i],
+      [key]: value,
+    };
     setOffers(copy);
   };
 
@@ -54,7 +61,7 @@ export default function OffersAdmin() {
     ]);
   };
 
-  const remove = (i) => {
+  const remove = (i: number) => {
     setOffers(offers.filter((_, index) => index !== i));
   };
 
@@ -116,4 +123,4 @@ export default function OffersAdmin() {
       </div>
     </div>
   );
-}
+            }
