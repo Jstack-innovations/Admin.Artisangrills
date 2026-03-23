@@ -30,7 +30,7 @@ export default function Login() {
   // Fetch admins
   useEffect(() => {
 
-    fetch(`${API_BASE}/admin`)
+    fetch(`${API_BASE}/adminnn`)
       .then(res => res.json())
       .then(data => {
         console.log("Admins fetched:",data);
