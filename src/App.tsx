@@ -68,7 +68,7 @@ export default function PaidOrders() {
   }, [navigate]);
 
   useEffect(() => {
-    fetch(`${API_BASE}/getOrder`)
+    fetch(`${API_BASE}/getOrdeeeeeer`)
       .then((res) => res.json())
       .then((data) => {
         setOrders(Object.values(data.orders || {}));
