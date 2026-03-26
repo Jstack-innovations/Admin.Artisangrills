@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_BASE } from "./Config/api";
+import { apiFetch } from "./Config/Utils/api";
 import "./App.css";
 
 type OrderItem = {
@@ -46,40 +46,12 @@ export default function PaidOrders() {
   const [stats, setStats] = useState<Stats>({});
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/checkSession`,
-          { credentials: "include" }
-        );
-        const data = await res.json();
-
-        if (!data.loggedIn) {
-          navigate("/login");
-        }
-      } catch (err) {
-        console.error("Session check failed:", err);
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-  }, [navigate]);
-
   
   useEffect(() => {
   const fetchOrders = async () => {
     try {
-      const res = await fetch(`${API_BASE}/getOrder`, {
-        credentials: "include"
-      });
-
-      // If backend blocked them
-      if (res.status === 401) {
-        navigate("/login");
-        return;
-      }
+      const res = await apiFetch("/getOrder");
+      if (!res) return;
 
       const data = await res.json();
 
@@ -87,22 +59,24 @@ export default function PaidOrders() {
       setStats(data.stats || {});
     } catch (err) {
       console.error(err);
-      navigate("/login");
     }
   };
 
   fetchOrders();
-}, [navigate]);
+}, []);
   
 
   const deleteOrder = async (id: number) => {
     if (!confirm("Delete this order?")) return;
 
-    const res = await fetch(
-      `${API_BASE}/adminDeleteOrder?id=${id}`,
-      { method: "DELETE" }
-    );
+    const res = await apiFetch(
+  `/adminDeleteOrder?id=${id}`,
+  { method: "DELETE" }
+);
 
+if (!res) return;
+
+const data = await res.json();
     const data = await res.json();
 
     if (data.success) {
