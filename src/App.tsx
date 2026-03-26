@@ -44,9 +44,7 @@ export default function PaidOrders() {
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<Stats>({});
-  const [menuOpen, setMenuOpen] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -64,7 +62,6 @@ export default function PaidOrders() {
         const data = await res.json();
         setOrders(Object.values(data.orders || {}));
         setStats(data.stats || {});
-        setAuthorized(true);
       } catch (err) {
         console.error(err);
         navigate("/login", { replace: true });
@@ -145,6 +142,107 @@ export default function PaidOrders() {
           <div className="order-items">
             {(o.items || []).map((i, idx) => (
               <div className="item" key={idx}>
+                <img src={i.image} alt="" />
+                <div>
+                  {i.name} x{i.qty}
+                </div>
+              </div>
+            ))}
+          </div>
+        </td>
+        <td>${parseFloat(o.info.total_amount).toFixed(2)}</td>
+        <td>{o.info.payment_ref}</td>
+        <td>{o.info.status}</td>
+        <td>{o.info.order_status}</td>
+        <td>{o.info.full_address || "-"}</td>
+        <td>{o.info.pickup_time || "-"}</td>
+        <td>{new Date(o.info.created_at).toLocaleString()}</td>
+        <td>
+          <button
+            className="btn"
+            onClick={() => navigate(`/edit-order/${o.info.order_id}`)}
+          >
+            Edit
+          </button>
+          <button
+            className="btn"
+            onClick={() => deleteOrder(o.info.order_id)}
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    ));
+  };
+
+  return (
+    <>
+      <div className="wrapper">
+        <h2>Paid Orders</h2>
+
+        <div className="cards">
+          <div className="card">
+            <h3>Total Placed Orders</h3>
+            {renderStat(stats.totalPlaced)}
+          </div>
+
+          <div className="card">
+            <h3>Total Served Orders</h3>
+            {renderStat(stats.totalServed)}
+          </div>
+
+          <div className="card">
+            <h3>Total Delivered Orders</h3>
+            {renderStat(stats.totalDelivered)}
+          </div>
+
+          <div className="card">
+            <h3>Total Pickup Orders</h3>
+            {renderStat(stats.totalPickup)}
+          </div>
+
+          <div className="card">
+            <h3>Total Revenue</h3>
+            <p className={!authChecked ? "skeleton" : ""}>
+              {authChecked
+                ? `$${typeof stats.totalRevenue === "number" ? stats.totalRevenue.toFixed(2) : "0.00"}`
+                : ""}
+            </p>
+          </div>
+        </div>
+
+        <button className="btn" onClick={() => navigate("/add-order")}>
+          Add Order
+        </button>
+
+        <div className="scroll-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Plate Order No</th>
+                <th>User ID</th>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Table</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Payment Ref</th>
+                <th>Status</th>
+                <th>Order Status</th>
+                <th>Full Address</th>
+                <th>Pickup Time</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>{renderOrders()}</tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  );
+            }              <div className="item" key={idx}>
                 <img src={i.image} alt="" />
                 <div>
                   {i.name} x{i.qty}
