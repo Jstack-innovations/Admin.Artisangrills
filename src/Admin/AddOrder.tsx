@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Css/AddOrder.css";
-import { API_BASE } from "../Config/api";
+import { apiFetch } from "../Config/Utils/api";
 
 type Order = {
   name: string;
@@ -29,27 +29,7 @@ export default function AddOrder() {
     plate_order_no: "",
   });
   
-  
-  useEffect(() => {
-  const checkSession = async () => {
-    try {
-      const res = await fetch(
-           `${API_BASE}/checkSession`,
-        { credentials: "include" } // include cookies
-      );
-      const data = await res.json();
 
-      if (!data.loggedIn) {
-        navigate("/login"); // redirect to login if no session
-      }
-    } catch (err) {
-      console.error("Session check failed:", err);
-      navigate("/login");
-    }
-  };
-
-  checkSession();
-}, [navigate]);
 
 
   const handleChange = (
@@ -64,31 +44,30 @@ export default function AddOrder() {
 };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const res = await fetch(
-        `${API_BASE}/adminAddOrder`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(order),
-        }
-      );
+  try {
+    const res = await apiFetch("/adminAddOrder", {
+      method: "POST",
+      body: JSON.stringify(order),
+    });
 
-      const data = await res.json();
+    // If 401 happened, apiFetch already redirected.
+    if (!res) return;
 
-      if (data.success) {
-        alert("Order added successfully!");
-        navigate("/");
-      } else {
-        alert("Failed to add order: " + (data.error || "unknown"));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add order: network error");
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Order added successfully!");
+      navigate("/");
+    } else {
+      alert("Failed to add order: " + (data.error || "unknown"));
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Network error");
+  }
+};
 
   return (
     <div className="wrapper">
