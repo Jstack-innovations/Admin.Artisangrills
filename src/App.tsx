@@ -39,44 +39,49 @@ type Stats = {
   totalRevenue?: number;
 };
 
+
+
+
 export default function PaidOrders() {
   const navigate = useNavigate();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [menuOpen, setMenuOpen] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false); // ✅ new
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const checkAuth = async () => {
       try {
         const res = await fetch(`${API_BASE}/getOrder`, {
           credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         });
 
         if (res.status === 401) {
-          navigate("/login");
+          navigate("/login", { replace: true });
           return;
         }
 
         const data = await res.json();
         setOrders(Object.values(data.orders || {}));
         setStats(data.stats || {});
+        setAuthorized(true);
       } catch (err) {
         console.error(err);
+        navigate("/login", { replace: true });
       } finally {
-        setAuthChecked(true); // ✅ mark auth check complete
+        setAuthChecked(true);
       }
     };
 
-    fetchOrders();
+    checkAuth();
   }, [navigate]);
 
-  // ✅ Don't render anything until auth check is done
-  if (!authChecked) return null;
+  // 🔹 Don't render anything until auth is checked AND authorized
+  if (!authChecked || !authorized) return null;
+  
 
   const deleteOrder = async (id: number) => {
     if (!confirm("Delete this order?")) return;
