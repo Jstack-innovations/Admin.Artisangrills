@@ -55,13 +55,13 @@ export default function AddOrder() {
       body: JSON.stringify(order),
     });
 
-    // Handle 401 Unauthorized
-    if (res.status === 401) {
+    const data = await res.json(); // parse JSON
+
+    // Check for status 401 OR error message from backend
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
       navigate("/login");
       return;
     }
-
-    const data = await res.json(); // ✅ parse JSON
 
     if (data.success) {
       alert("Order added successfully!");
