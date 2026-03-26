@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_BASE } from "../Config/api";
+import { apiFetch } from "../Config/Utils/api";
 import "./Css/AdminLogin.css";
 
 type Admin = { id: number; email: string; password: string };
@@ -14,68 +14,41 @@ export default function Login() {
   const [error,setError] = useState("");
   const [admins,setAdmins] = useState<Admin[]>([]);
 
-  // Check session
-  useEffect(() => {
-    fetch(
-        `${API_BASE}/checkSession`,
-      { credentials:"include" }
-    )
-    .then(res => res.json())
-    .then(data => {
-      if(data.loggedIn) navigate("/");
-    })
-    .catch(() => {});
-  },[navigate]);
-
   // Fetch admins
   useEffect(() => {
-
-    fetch(`${API_BASE}/admin`)
-      .then(res => res.json())
-      .then(data => {
-        console.log("Admins fetched:",data);
-        setAdmins(data.admins || []);
-      })
-      .catch(err => console.error("Failed to fetch admins:",err));
-
-  },[]);
-
-  const handleSubmit = async (e:React.FormEvent) => {
-
-    e.preventDefault();
-    setError("");
-
-    console.log("Logging in with:",{email,password});
-
-    try{
-
-      const res = await fetch(
-        `${API_BASE}/adminLogin`,
-        {
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
-          body:JSON.stringify({email,password}),
-          credentials:"include"
-        }
-      );
-
-      const data = await res.json();
-      console.log("Login response:",data);
-
-      if(data.success){
-        navigate("/");
-      }else{
-        setError(data.error || "Invalid email or password");
-      }
-
-    }catch(err){
-
-      console.error(err);
-      setError("Login failed. Try again.");
-
-    }
-
+  const fetchAdmins = async () => {
+    const res = await apiFetch("/admin");
+    if (!res) return; // apiFetch already handled 401
+    const data = await res.json();
+    setAdmins(data.admins || []);
   };
+  fetchAdmins();
+}, [])
+
+
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
+
+  try {
+    const res = await apiFetch("/adminLogin", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res) return; // apiFetch redirects if 401
+    const data = await res.json();
+
+    if (data.success) {
+      navigate("/");
+    } else {
+      setError(data.error || "Invalid email or password");
+    }
+  } catch (err) {
+    console.error(err);
+    setError("Login failed. Try again.");
+  }
+};
 
   return(
 
