@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "./Config/Utils/api";
+import { API_BASE } from "./Config/api";
 import "./App.css";
 
 type OrderItem = {
@@ -50,15 +50,14 @@ export default function PaidOrders() {
 useEffect(() => {
   const fetchOrders = async () => {
     try {
-      const res = await fetch("/getOrder", {
-        credentials: "include", // send cookies
+      const res = await fetch(`${API_BASE}/getOrder`, {
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
       });
 
       if (res.status === 401) {
-        // Not logged in
         navigate("/login");
         return;
       }
@@ -80,7 +79,7 @@ useEffect(() => {
   if (!confirm("Delete this order?")) return;
 
   try {
-    const res = await fetch(`/adminDeleteOrder?id=${id}`, {
+    const res = await fetch(`${API_BASE}/adminDeleteOrder?id=${id}`, {
       method: "DELETE",
       credentials: "include",
       headers: {
@@ -94,7 +93,6 @@ useEffect(() => {
     }
 
     const data = await res.json();
-
     if (data.success) {
       setOrders((prev) => prev.filter((o) => o.info.order_id !== id));
     }
