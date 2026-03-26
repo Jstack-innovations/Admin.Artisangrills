@@ -47,14 +47,23 @@ export default function PaidOrders() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   
-  useEffect(() => {
+useEffect(() => {
   const fetchOrders = async () => {
     try {
-      const res = await apiFetch("/getOrder");
-      if (!res) return;
+      const res = await fetch("/getOrder", {
+        credentials: "include", // send cookies
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.status === 401) {
+        // Not logged in
+        navigate("/login");
+        return;
+      }
 
       const data = await res.json();
-
       setOrders(Object.values(data.orders || {}));
       setStats(data.stats || {});
     } catch (err) {
@@ -63,28 +72,36 @@ export default function PaidOrders() {
   };
 
   fetchOrders();
-}, []);
+}, [navigate]);
+  
   
 
   const deleteOrder = async (id: number) => {
-    if (!confirm("Delete this order?")) return;
+  if (!confirm("Delete this order?")) return;
 
-    const res = await apiFetch(
-  `/adminDeleteOrder?id=${id}`,
-  { method: "DELETE" }
-);
+  try {
+    const res = await fetch(`/adminDeleteOrder?id=${id}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-if (!res) return;
+    if (res.status === 401) {
+      navigate("/login");
+      return;
+    }
 
-const data = await res.json();
     const data = await res.json();
 
     if (data.success) {
-      setOrders((prev) =>
-        prev.filter((o) => o.info.order_id !== id)
-      );
+      setOrders((prev) => prev.filter((o) => o.info.order_id !== id));
     }
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   return (
     <>
