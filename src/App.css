@@ -35,6 +35,21 @@ body{
 
   margin: 0;
 }
+
+
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  min-height: 1em;
+  display: inline-block;
+  width: 100%;
+  animation: shimmer 1.2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
     
     /* =========================
    HEADER + NAV STYLES
