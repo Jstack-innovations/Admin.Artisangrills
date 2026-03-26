@@ -20,11 +20,11 @@ export default function Login() {
     const res = await apiFetch("/admin");
     if (!res) return; // apiFetch already handled 401
     const data = await res.json();
-    setAdmins(data.admins || []);
+    // handle both array or object with admins
+    setAdmins(Array.isArray(data) ? data : data.admins || []);
   };
   fetchAdmins();
-}, [])
-
+}, []);
 
   
   const handleSubmit = async (e: React.FormEvent) => {
