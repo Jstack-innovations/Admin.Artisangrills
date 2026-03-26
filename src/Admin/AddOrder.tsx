@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Css/AddOrder.css";
-import { apiFetch } from "../Config/Utils/api";
-
+import { API_BASE } from "../Config/api";
 type Order = {
   name: string;
   phone: string;
@@ -47,15 +46,20 @@ export default function AddOrder() {
   e.preventDefault();
 
   try {
-    const res = await apiFetch("/adminAddOrder", {
-      method: "POST",
-      body: JSON.stringify(order),
-    });
+    const res = await fetch(`${API_BASE}/adminAddOrder`, {
+  method: "POST",
+  credentials: "include", // send cookies
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(order),
+});
 
-    // If 401 happened, apiFetch already redirected.
-    if (!res) return;
-
-    const data = await res.json();
+// handle 401
+if (res.status === 401) {
+  navigate("/login");
+  return;
+}
 
     if (data.success) {
       alert("Order added successfully!");
