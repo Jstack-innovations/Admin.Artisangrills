@@ -47,19 +47,21 @@ export default function AddOrder() {
 
   try {
     const res = await fetch(`${API_BASE}/adminAddOrder`, {
-  method: "POST",
-  credentials: "include", // send cookies
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(order),
-});
+      method: "POST",
+      credentials: "include", // send cookies
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    });
 
-// handle 401
-if (res.status === 401) {
-  navigate("/login");
-  return;
-}
+    // Handle 401 Unauthorized
+    if (res.status === 401) {
+      navigate("/login");
+      return;
+    }
+
+    const data = await res.json(); // ✅ parse JSON
 
     if (data.success) {
       alert("Order added successfully!");
