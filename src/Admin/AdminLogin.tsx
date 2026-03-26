@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../Config/Utils/api";
+import { API_BASE } from "../Config/api";
 import "./Css/AdminLogin.css";
 
 type Admin = { id: number; email: string; password: string };
@@ -16,39 +16,53 @@ export default function Login() {
 
   // Fetch admins
   useEffect(() => {
-  const fetchAdmins = async () => {
-    const res = await apiFetch("/admin");
-    if (!res) return; // apiFetch already handled 401
-    const data = await res.json();
-    // handle both array or object with admins
-    setAdmins(Array.isArray(data) ? data : data.admins || []);
-  };
-  fetchAdmins();
-}, []);
 
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError("");
+    fetch(`${API_BASE}/admins`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("Admins fetched:",data);
+        setAdmins(data.admins || []);
+      })
+      .catch(err => console.error("Failed to fetch admins:",err));
 
-  try {
-    const res = await apiFetch("/adminLogin", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
-    if (!res) return; // apiFetch redirects if 401
-    const data = await res.json();
+  },[]);
 
-    if (data.success) {
-      navigate("/");
-    } else {
-      setError(data.error || "Invalid email or password");
+  const handleSubmit = async (e:React.FormEvent) => {
+
+    e.preventDefault();
+    setError("");
+
+    console.log("Logging in with:",{email,password});
+
+    try{
+
+      const res = await fetch(
+        `${API_BASE}/login`,
+        {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body:JSON.stringify({email,password}),
+          credentials:"include"
+        }
+      );
+
+      const data = await res.json();
+      console.log("Login response:",data);
+
+      if(data.success){
+        navigate("/");
+      }else{
+        setError(data.error || "Invalid email or password");
+      }
+
+    }catch(err){
+
+      console.error(err);
+      setError("Login failed. Try again.");
+
     }
-  } catch (err) {
-    console.error(err);
-    setError("Login failed. Try again.");
-  }
-};
+
+  };
 
   return(
 
