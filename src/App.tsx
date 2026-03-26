@@ -67,15 +67,33 @@ export default function PaidOrders() {
     checkSession();
   }, [navigate]);
 
+  
   useEffect(() => {
-    fetch(`${API_BASE}/getOrdeeeeeer`)
-      .then((res) => res.json())
-      .then((data) => {
-        setOrders(Object.values(data.orders || {}));
-        setStats(data.stats || {});
-      })
-      .catch((err) => console.log(err));
-  }, []);
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/getOrder`, {
+        credentials: "include"
+      });
+
+      // If backend blocked them
+      if (res.status === 401) {
+        navigate("/login");
+        return;
+      }
+
+      const data = await res.json();
+
+      setOrders(Object.values(data.orders || {}));
+      setStats(data.stats || {});
+    } catch (err) {
+      console.error(err);
+      navigate("/login");
+    }
+  };
+
+  fetchOrders();
+}, [navigate]);
+  
 
   const deleteOrder = async (id: number) => {
     if (!confirm("Delete this order?")) return;
