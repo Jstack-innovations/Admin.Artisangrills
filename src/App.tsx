@@ -45,12 +45,45 @@ export default function PaidOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [menuOpen, setMenuOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false); // ✅ new
 
-  
-useEffect(() => {
-  const fetchOrders = async () => {
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/getOrder`, {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (res.status === 401) {
+          navigate("/login");
+          return;
+        }
+
+        const data = await res.json();
+        setOrders(Object.values(data.orders || {}));
+        setStats(data.stats || {});
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setAuthChecked(true); // ✅ mark auth check complete
+      }
+    };
+
+    fetchOrders();
+  }, [navigate]);
+
+  // ✅ Don't render anything until auth check is done
+  if (!authChecked) return null;
+
+  const deleteOrder = async (id: number) => {
+    if (!confirm("Delete this order?")) return;
+
     try {
-      const res = await fetch(`${API_BASE}/getOrder`, {
+      const res = await fetch(`${API_BASE}/adminDeleteOrder?id=${id}`, {
+        method: "DELETE",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -63,43 +96,13 @@ useEffect(() => {
       }
 
       const data = await res.json();
-      setOrders(Object.values(data.orders || {}));
-      setStats(data.stats || {});
+      if (data.success) {
+        setOrders((prev) => prev.filter((o) => o.info.order_id !== id));
+      }
     } catch (err) {
       console.error(err);
     }
   };
-
-  fetchOrders();
-}, [navigate]);
-  
-  
-
-  const deleteOrder = async (id: number) => {
-  if (!confirm("Delete this order?")) return;
-
-  try {
-    const res = await fetch(`${API_BASE}/adminDeleteOrder?id=${id}`, {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (res.status === 401) {
-      navigate("/login");
-      return;
-    }
-
-    const data = await res.json();
-    if (data.success) {
-      setOrders((prev) => prev.filter((o) => o.info.order_id !== id));
-    }
-  } catch (err) {
-    console.error(err);
-  }
-};
 
   return (
     <>
@@ -164,7 +167,6 @@ useEffect(() => {
             <p>{stats.totalPlaced}</p>
           </div>
 
-        
           <div className="card">
             <h3>Total Served Orders</h3>
             <p>{stats.totalServed}</p>
