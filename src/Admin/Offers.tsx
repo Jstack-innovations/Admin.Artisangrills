@@ -19,27 +19,6 @@ export default function OffersAdmin() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/checkSession`,
-          { credentials: "include" }
-        );
-        const data = await res.json();
-
-        if (!data.loggedIn) {
-          navigate("/login");
-        }
-      } catch (err) {
-        console.error("Session check failed:", err);
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-  }, [navigate]);
-
-  useEffect(() => {
     fetch(GET_URL)
       .then((res) => res.json())
       .then((data) => setOffers(data));
