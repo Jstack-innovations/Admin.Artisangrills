@@ -33,7 +33,9 @@ export default function MenuPage() {
 
   // GET menu is free
   const fetchMenu = async () => {
-  const res = await fetch(`${API_BASE}/getMenu`);
+  const res = await fetch(`${API_BASE}/getMenu`, {
+    credentials: "include", // <-- send the session cookie
+  });
   const data = await res.json();
 
   if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
@@ -53,6 +55,7 @@ const handleAdd = async (e: React.FormEvent) => {
   const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // <-- session cookie sent
     body: JSON.stringify({
       action: "add",
       category: form.category,
@@ -79,6 +82,7 @@ const handleUpdate = async (category: string, item: MenuItem) => {
   const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // <-- session cookie sent
     body: JSON.stringify({
       action: "update",
       category,
@@ -106,6 +110,7 @@ const handleDelete = async (category: string, id: number) => {
   const res = await fetch(`${API_BASE}/adminUpdateMenu`, { // fixed typo here
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // <-- session cookie sent
     body: JSON.stringify({
       action: "delete",
       category,
