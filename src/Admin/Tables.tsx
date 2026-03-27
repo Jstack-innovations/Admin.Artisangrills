@@ -19,61 +19,84 @@ export default function Tables() {
   const [tables, setTables] = useState<Table[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // ---- SESSION CHECK ----
   useEffect(() => {
     const checkSession = async () => {
       try {
         const res = await fetch(`${API_BASE}/checkSession`, {
-          credentials: "include",
+          credentials: "include", // send session cookie
         });
         const data = await res.json();
 
         if (!data.loggedIn) {
-          navigate("/login");
+          navigate("/login", { replace: true });
         }
       } catch (err) {
         console.error("Session check failed:", err);
-        navigate("/login");
+        navigate("/login", { replace: true });
       }
     };
 
     checkSession();
   }, [navigate]);
 
-  // ✅ FIXED: supports FLOORS response
+  // ---- FETCH TABLES ----
   const fetchTables = async () => {
-    const res = await fetch(`${API_BASE}/getTable`);
-    const data = await res.json();
+    try {
+      const res = await fetch(`${API_BASE}/getTable`, {
+        credentials: "include",
+      });
+      const data = await res.json();
 
-    const allTables = Object.values(data.floors || {}).flat();
+      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+        navigate("/login", { replace: true });
+        return;
+      }
 
-    setTables(allTables as Table[]);
+      const allTables = Object.values(data.floors || {}).flat();
+      setTables(allTables as Table[]);
+    } catch (err) {
+      console.error("Failed to fetch tables:", err);
+      navigate("/login", { replace: true });
+    }
   };
 
   useEffect(() => {
     fetchTables();
   }, []);
 
-  // ✅ UPDATE TABLE (INCLUDING AMOUNT)
+  // ---- UPDATE TABLE ----
   const handleTableEdit = async (table: Table) => {
-    const res = await fetch(`${API_BASE}/adminUpdateTable`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "edit",
-        id: table.id,
-        number: table.number,
-        seats: table.seats,
-        description: table.description,
-        image: table.image,
-        amount: table.amount,
-      }),
-    });
+    try {
+      const res = await fetch(`${API_BASE}/adminUpdateTable`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          action: "edit",
+          id: table.id,
+          number: table.number,
+          seats: table.seats,
+          description: table.description,
+          image: table.image,
+          amount: table.amount,
+        }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!data.success) {
-      alert("Update failed: " + data.error);
-      fetchTables();
+      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (!data.success) {
+        alert("Update failed: " + data.error);
+        fetchTables();
+      }
+    } catch (err) {
+      console.error("Update failed:", err);
+      navigate("/login", { replace: true });
     }
   };
 
@@ -82,46 +105,68 @@ export default function Tables() {
       prev.map((t) => (t.id === table.id ? { ...t, booked } : t))
     );
 
-    const res = await fetch(`${API_BASE}/adminUpdateTable`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: table.id,
-        booked_id: table.booked_id,
-        action: "update",
-        booked,
-      }),
-    });
+    try {
+      const res = await fetch(`${API_BASE}/adminUpdateTable`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          id: table.id,
+          booked_id: table.booked_id,
+          action: "update",
+          booked,
+        }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!data.success) {
-      alert("Update failed: " + data.error);
-      setTables((prev) =>
-        prev.map((t) =>
-          t.id === table.id ? { ...t, booked: table.booked } : t
-        )
-      );
+      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (!data.success) {
+        alert("Update failed: " + data.error);
+        setTables((prev) =>
+          prev.map((t) =>
+            t.id === table.id ? { ...t, booked: table.booked } : t
+          )
+        );
+      }
+    } catch (err) {
+      console.error("Update failed:", err);
+      navigate("/login", { replace: true });
     }
   };
 
   const handleDelete = async (table: Table) => {
     if (!table.booked_id) return alert("Nothing to delete");
 
-    const res = await fetch(`${API_BASE}/adminUpdateTable`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: table.id,
-        booked_id: table.booked_id,
-        action: "delete",
-      }),
-    });
+    try {
+      const res = await fetch(`${API_BASE}/adminUpdateTable`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          id: table.id,
+          booked_id: table.booked_id,
+          action: "delete",
+        }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.success) fetchTables();
-    else alert("Delete failed: " + data.error);
+      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      if (data.success) fetchTables();
+      else alert("Delete failed: " + data.error);
+    } catch (err) {
+      console.error("Delete failed:", err);
+      navigate("/login", { replace: true });
+    }
   };
 
   return (
@@ -283,4 +328,4 @@ export default function Tables() {
       </div>
     </div>
   );
-                }
+                      }
