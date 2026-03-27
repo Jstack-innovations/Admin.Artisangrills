@@ -33,86 +33,91 @@ export default function MenuPage() {
 
   // GET menu is free
   const fetchMenu = async () => {
-    const res = await fetch(`${API_BASE}/getMenu`);
-    const data = await res.json();
-    setMenu(data.menu);
-  };
+  const res = await fetch(`${API_BASE}/getMenu`);
+  const data = await res.json();
 
-  useEffect(() => {
-    fetchMenu();
-  }, []);
+  if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+    navigate("/login", { replace: true });
+    return;
+  }
 
-  // Add guarded
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "add",
-        category: form.category,
-        name: form.name,
-        description: form.description,
-        price: form.price,
-        image: form.image,
-        tags: form.tags.split(","),
-        badge: form.badge,
-        available: form.available === "1",
-      }),
-    });
-    const data = await res.json();
-    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-      navigate("/login", { replace: true });
-      return;
-    }
-    fetchMenu();
-  };
+  setMenu(data.menu);
+};
 
-  // Update guarded
-  const handleUpdate = async (category: string, item: MenuItem) => {
-    const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "update",
-        category,
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        image: item.image,
-        tags: item.tags,
-        badge: item.badge,
-        available: item.available,
-      }),
-    });
-    const data = await res.json();
-    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-      navigate("/login", { replace: true });
-      return;
-    }
-    fetchMenu();
-  };
+const handleAdd = async (e: React.FormEvent) => {
+  e.preventDefault();
+  const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "add",
+      category: form.category,
+      name: form.name,
+      description: form.description,
+      price: form.price,
+      image: form.image,
+      tags: form.tags.split(","),
+      badge: form.badge,
+      available: form.available === "1",
+    }),
+  });
 
-  // Delete guarded
-  const handleDelete = async (category: string, id: number) => {
-    const res = await fetch(`${API_BASE}/adminUpdateMemu`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "delete",
-        category,
-        id,
-      }),
-    });
-    const data = await res.json();
-    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-      navigate("/login", { replace: true });
-      return;
-    }
-    fetchMenu();
-  };
+  const data = await res.json();
+  if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+    navigate("/login", { replace: true });
+    return;
+  }
 
+  fetchMenu();
+};
+
+const handleUpdate = async (category: string, item: MenuItem) => {
+  const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "update",
+      category,
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      image: item.image,
+      tags: item.tags,
+      badge: item.badge,
+      available: item.available,
+    }),
+  });
+
+  const data = await res.json();
+  if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  fetchMenu();
+};
+
+const handleDelete = async (category: string, id: number) => {
+  const res = await fetch(`${API_BASE}/adminUpdateMenu`, { // fixed typo here
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "delete",
+      category,
+      id,
+    }),
+  });
+
+  const data = await res.json();
+  if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  fetchMenu();
+};
+  
   return (
     <div className="menu-page">
       <header>
