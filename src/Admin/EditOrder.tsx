@@ -21,37 +21,37 @@ export default function EditOrder() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/checkSession`,
-          { credentials: "include" }
-        );
-        const data = await res.json();
-
-        if (!data.loggedIn) {
-          navigate("/login");
-        }
-      } catch (err) {
-        console.error("Session check failed:", err);
-        navigate("/login");
-      }
-    };
-
-    checkSession();
-  }, [navigate]);
+  
 
   useEffect(() => {
-    if (!id) return;
+  if (!id) return;
 
-    fetch(`${API_BASE}/adminEditOrder?id=${id}`)
-      .then(res => res.json())
-      .then(data => {
-        setOrder(data);
-        setLoading(false);
+  const fetchOrder = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/adminEditOrder?id=${id}`, {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
       });
-  }, [id]);
+
+      // ✅ handle 401 like PaidOrders
+      if (res.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      const data = await res.json();
+      setOrder(data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to fetch order:", err);
+      navigate("/login", { replace: true });
+    }
+  };
+
+  fetchOrder();
+}, [id, navigate]);
+
+  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -62,18 +62,30 @@ export default function EditOrder() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!order || !id) return;
+  e.preventDefault();
+  if (!order || !id) return;
 
-    await fetch(`${API_BASE}/adminEditOrder?id=${id}`, {
+  try {
+    const res = await fetch(`${API_BASE}/adminEditOrder?id=${id}`, {
       method: "PUT",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(order),
     });
 
+    if (res.status === 401) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const data = await res.json();
     alert("Order updated!");
     navigate("/");
-  };
+  } catch (err) {
+    console.error("Failed to update order:", err);
+    navigate("/login", { replace: true });
+  }
+};
 
   if (loading || !order) return <div>Loading...</div>;
 
