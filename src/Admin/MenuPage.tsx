@@ -31,10 +31,9 @@ export default function MenuPage() {
   });
   const [hamburgerActive, setHamburgerActive] = useState(false);
 
+  // GET menu is free
   const fetchMenu = async () => {
-    const res = await fetch(
-        `${API_BASE}/getMenu`
-    );
+    const res = await fetch(`${API_BASE}/getMenu`);
     const data = await res.json();
     setMenu(data.menu);
   };
@@ -43,65 +42,74 @@ export default function MenuPage() {
     fetchMenu();
   }, []);
 
+  // Add guarded
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch(
-        `${API_BASE}/adminUpdateMenu`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "add",
-          category: form.category,
-          name: form.name,
-          description: form.description,
-          price: form.price,
-          image: form.image,
-          tags: form.tags.split(","),
-          badge: form.badge,
-          available: form.available === "1",
-        }),
-      }
-    );
+    const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "add",
+        category: form.category,
+        name: form.name,
+        description: form.description,
+        price: form.price,
+        image: form.image,
+        tags: form.tags.split(","),
+        badge: form.badge,
+        available: form.available === "1",
+      }),
+    });
+    const data = await res.json();
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+      navigate("/login", { replace: true });
+      return;
+    }
     fetchMenu();
   };
 
+  // Update guarded
   const handleUpdate = async (category: string, item: MenuItem) => {
-    await fetch(
-        `${API_BASE}/adminUpdateMenu`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "update",
-          category,
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          image: item.image,
-          tags: item.tags,
-          badge: item.badge,
-          available: item.available,
-        }),
-      }
-    );
+    const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "update",
+        category,
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        image: item.image,
+        tags: item.tags,
+        badge: item.badge,
+        available: item.available,
+      }),
+    });
+    const data = await res.json();
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+      navigate("/login", { replace: true });
+      return;
+    }
     fetchMenu();
   };
 
+  // Delete guarded
   const handleDelete = async (category: string, id: number) => {
-    await fetch(
-        `${API_BASE}/adminUpdateMemu`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "delete",
-          category,
-          id,
-        }),
-      }
-    );
+    const res = await fetch(`${API_BASE}/adminUpdateMemu`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "delete",
+        category,
+        id,
+      }),
+    });
+    const data = await res.json();
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+      navigate("/login", { replace: true });
+      return;
+    }
     fetchMenu();
   };
 
@@ -112,11 +120,11 @@ export default function MenuPage() {
           ARTISAN <span>GRILLS</span>
         </div>
         <nav className="nav">
-        <a href="/">All Orders</a>
-        <a href="/tables">Available Tables</a>
-        <a href="/menu">Add Menu</a>
-        <a href="/tax">Set Tax</a>
-        <a href="/check-reservations">View Reservations</a>
+          <a href="/">All Orders</a>
+          <a href="/tables">Available Tables</a>
+          <a href="/menu">Add Menu</a>
+          <a href="/tax">Set Tax</a>
+          <a href="/check-reservations">View Reservations</a>
         </nav>
         <button
           className={`hamburger ${hamburgerActive ? "active" : ""}`}
@@ -145,9 +153,7 @@ export default function MenuPage() {
               <select
                 required
                 value={form.category}
-                onChange={(e) =>
-                  setForm({ ...form, category: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
               >
                 <option value="">Select Category</option>
                 {Object.keys(menu).map((cat) => (
@@ -197,9 +203,7 @@ export default function MenuPage() {
               <input
                 placeholder="Description"
                 value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
                 required
               />
               <select
@@ -217,114 +221,114 @@ export default function MenuPage() {
           </form>
         </div>
 
-{Object.entries(menu).map(([category, items]) => (
-  <div key={category} className="category">
-    <h2>{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
-    <div className="grid">
-      {items.map((item) => (
-        <div key={item.id} className="card">
-          <img src={item.image} alt={item.name} />
-          <h3>{item.name}</h3>
-          <p>{item.description}</p>
-          <p><strong>Price:</strong> ${item.price}</p>
-          <p><strong>Tags:</strong> {item.tags.join(", ")}</p>
-          <p><strong>Badge:</strong> {item.badge ?? "—"}</p>
-          <p><strong>Available:</strong> {item.available ? "Yes" : "No"}</p>
+        {Object.entries(menu).map(([category, items]) => (
+          <div key={category} className="category">
+            <h2>{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
+            <div className="grid">
+              {items.map((item) => (
+                <div key={item.id} className="card">
+                  <img src={item.image} alt={item.name} />
+                  <h3>{item.name}</h3>
+                  <p>{item.description}</p>
+                  <p><strong>Price:</strong> ${item.price}</p>
+                  <p><strong>Tags:</strong> {item.tags.join(", ")}</p>
+                  <p><strong>Badge:</strong> {item.badge ?? "—"}</p>
+                  <p><strong>Available:</strong> {item.available ? "Yes" : "No"}</p>
 
-          {/* Editable fields */}
-          <div className="form-row">
-            <input
-              value={item.name}
-              onChange={(e) => {
-                const newItems = menu[category].map((i) =>
-                  i.id === item.id ? { ...i, name: e.target.value } : i
-                );
-                setMenu({ ...menu, [category]: newItems });
-              }}
-            />
-            <input
-              type="number"
-              value={item.price}
-              onChange={(e) => {
-                const newItems = menu[category].map((i) =>
-                  i.id === item.id ? { ...i, price: parseFloat(e.target.value) } : i
-                );
-                setMenu({ ...menu, [category]: newItems });
-              }}
-            />
+                  {/* Editable fields */}
+                  <div className="form-row">
+                    <input
+                      value={item.name}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, name: e.target.value } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                    <input
+                      type="number"
+                      value={item.price}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, price: parseFloat(e.target.value) } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <input
+                      value={item.image}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, image: e.target.value } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                    <input
+                      value={item.badge ?? ""}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, badge: e.target.value } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <input
+                      value={item.description}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, description: e.target.value } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                    <input
+                      value={item.tags.join(", ")}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, tags: e.target.value.split(",") } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                  </div>
+                  <div className="form-rowT">
+                    <select
+                      value={item.available ? "1" : "0"}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, available: e.target.value === "1" } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    >
+                      <option value="1">Available</option>
+                      <option value="0">Not Available</option>
+                    </select>
+                    <button
+                      className="btn"
+                      onClick={() => handleUpdate(category, item)}
+                    >
+                      Update
+                    </button>
+                  </div>
+                  <button
+                    className="btn"
+                    onClick={() => handleDelete(category, item.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="form-row">
-            <input
-              value={item.image}
-              onChange={(e) => {
-                const newItems = menu[category].map((i) =>
-                  i.id === item.id ? { ...i, image: e.target.value } : i
-                );
-                setMenu({ ...menu, [category]: newItems });
-              }}
-            />
-            <input
-              value={item.badge ?? ""}
-              onChange={(e) => {
-                const newItems = menu[category].map((i) =>
-                  i.id === item.id ? { ...i, badge: e.target.value } : i
-                );
-                setMenu({ ...menu, [category]: newItems });
-              }}
-            />
-          </div>
-          <div className="form-row">
-            <input
-              value={item.description}
-              onChange={(e) => {
-                const newItems = menu[category].map((i) =>
-                  i.id === item.id ? { ...i, description: e.target.value } : i
-                );
-                setMenu({ ...menu, [category]: newItems });
-              }}
-            />
-            <input
-              value={item.tags.join(", ")}
-              onChange={(e) => {
-                const newItems = menu[category].map((i) =>
-                  i.id === item.id ? { ...i, tags: e.target.value.split(",") } : i
-                );
-                setMenu({ ...menu, [category]: newItems });
-              }}
-            />
-          </div>
-          <div className="form-rowT">
-            <select
-              value={item.available ? "1" : "0"}
-              onChange={(e) => {
-                const newItems = menu[category].map((i) =>
-                  i.id === item.id ? { ...i, available: e.target.value === "1" } : i
-                );
-                setMenu({ ...menu, [category]: newItems });
-              }}
-            >
-              <option value="1">Available</option>
-              <option value="0">Not Available</option>
-            </select>
-            <button
-              className="btn"
-              onClick={() => handleUpdate(category, item)}
-            >
-              Update
-            </button>
-          </div>
-          <button
-            className="btn"
-            onClick={() => handleDelete(category, item.id)}
-          >
-            Delete
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-))}
+        ))}
       </div>
     </div>
   );
-          }
+                                  }
