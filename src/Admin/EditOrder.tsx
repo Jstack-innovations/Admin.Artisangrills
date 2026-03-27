@@ -61,6 +61,8 @@ export default function EditOrder() {
     );
   };
 
+  
+
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   if (!order || !id) return;
@@ -78,7 +80,9 @@ export default function EditOrder() {
       return;
     }
 
-    const data = await res.json();
+    // ✅ just await without assigning since TS complains
+    await res.json();
+
     alert("Order updated!");
     navigate("/");
   } catch (err) {
@@ -86,6 +90,8 @@ export default function EditOrder() {
     navigate("/login", { replace: true });
   }
 };
+
+  
 
   if (loading || !order) return <div>Loading...</div>;
 
