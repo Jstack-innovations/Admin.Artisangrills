@@ -101,26 +101,9 @@ export default function PaidOrders() {
     }
   };
 
-  // 🔹 Helpers to show skeleton if not loaded yet
-  const renderStat = (value?: number) => (
-    <p className={!authChecked ? "skeleton" : ""}>
-      {authChecked ? value ?? 0 : ""}
-    </p>
-  );
 
-  const renderOrders = () => {
-    if (!authChecked) {
-      // Skeleton rows
-      return Array.from({ length: 5 }).map((_, idx) => (
-        <tr key={idx}>
-          {Array.from({ length: 15 }).map((__, jdx) => (
-            <td key={jdx} className="skeleton">
-              &nbsp;
-            </td>
-          ))}
-        </tr>
-      ));
-    }
+  
+  const renderStat = (value?: number) => <p>{value ?? 0}</p>;
 
     if (orders.length === 0) {
       return (
@@ -262,11 +245,9 @@ export default function PaidOrders() {
 
           <div className="card">
             <h3>Total Revenue</h3>
-            <p className={!authChecked ? "skeleton" : ""}>
-              {authChecked
-                ? `$${typeof stats.totalRevenue === "number" ? stats.totalRevenue.toFixed(2) : "0.00"}`
-                : ""}
-            </p>
+            <p>
+  ${typeof stats.totalRevenue === "number" ? stats.totalRevenue.toFixed(2) : "0.00"}
+</p>
           </div>
         </div>
 
