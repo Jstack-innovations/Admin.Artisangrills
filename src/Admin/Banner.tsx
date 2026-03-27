@@ -18,7 +18,9 @@ export default function BannerAdmin() {
   const [banner, setBanner] = useState<Banner | null>(null);
   const navigate = useNavigate();
 
-  // ✅ Fetch banner and let backend respond 401 if not logged in
+
+
+  // ✅ Fetch banner and handle 401
   useEffect(() => {
     const fetchBanner = async () => {
       try {
@@ -33,6 +35,7 @@ export default function BannerAdmin() {
         setBanner(data);
       } catch (err) {
         console.error("Failed to fetch banner:", err);
+        navigate("/login", { replace: true });
       }
     };
 
@@ -56,7 +59,7 @@ export default function BannerAdmin() {
     });
   };
 
-  // ✅ Save and let backend respond 401 if session expired
+  // ✅ Save changes and handle 401
   const save = async () => {
     if (!banner) return;
 
@@ -77,6 +80,7 @@ export default function BannerAdmin() {
       alert("Banner saved!");
     } catch (err) {
       console.error("Failed to save banner:", err);
+      navigate("/login", { replace: true });
     }
   };
 
