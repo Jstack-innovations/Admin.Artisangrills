@@ -20,40 +20,16 @@ export default function BannerAdmin() {
 
   // ✅ Fetch banner and let backend return 401 if not logged in
   useEffect(() => {
-    const fetchBanner = async () => {
-      try {
-        const res = await fetch(GET_URL, {
-          credentials: "include", // IMPORTANT for session cookie
-        });
+    fetch(GET_URL)
+      .then((res) => res.json())
+      .then((data) => setBanner(data));
+  }, []);
 
-        const data = await res.json();
-
-        if (
-          res.status === 401 ||
-          data.error === "Unauthorized" ||
-          data.error === "Session expired"
-        ) {
-          navigate("/login");
-          return;
-        }
-
-        setBanner(data);
-      } catch (err) {
-        console.error("Failed to fetch banner:", err);
-      }
-    };
-
-    fetchBanner();
-  }, [navigate]);
-
-  const updateAddress = (value: string) => {
-    if (!banner) return;
+  const updateAddress = (value) => {
     setBanner({ ...banner, address: value });
   };
 
-  const updateDiscount = (key: keyof Banner["discount"], value: string) => {
-    if (!banner) return;
-
+  const updateDiscount = (key, value) => {
     setBanner({
       ...banner,
       discount: {
@@ -62,6 +38,7 @@ export default function BannerAdmin() {
       },
     });
   };
+  
 
   // ✅ Save and let backend return 401 if session expired
   const save = async () => {
