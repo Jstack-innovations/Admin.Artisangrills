@@ -37,7 +37,7 @@ export default function Login() {
     try{
 
       const res = await fetch(
-        `${API_BASE}/login`,
+        `${API_BASE}/adminLogin`,
         {
           method:"POST",
           headers:{ "Content-Type":"application/json" },
