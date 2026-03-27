@@ -13,86 +13,81 @@ export default function AdminUsers(){
   const API = `${API_BASE}/UandV`;  
 
   // ---- FETCH USERS AND VERIFICATIONS ----
-  useEffect(()=>{  
-    const fetchData = async () => {
-      try {
-        const res = await fetch(API, { credentials: "include" });
-        const data = await res.json();
+useEffect(()=>{  
+  fetch(API, { credentials:"include" })
+    .then(async (res) => {
+      const data = await res.json();
 
-        if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-          navigate("/login", { replace: true });
-          return;
-        }
-
-        setUsers(data.users || []);  
-        setVerifications(data.verifications || []);  
-      } catch(err) {
-        console.error("Failed to fetch users/verifications:", err);
+      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
         navigate("/login", { replace: true });
+        return;
       }
+
+      setUsers(data.users || []);  
+      setVerifications(data.verifications || []);  
+    })
+    .catch(err => {
+      console.error(err);
+      navigate("/login", { replace: true });
+    });
+},[]);  
+
+function saveEdit(){  
+  fetch(`${API_BASE}/adminUpdateUser`, {
+    method:"PUT",
+    headers:{ "Content-Type":"application/json" },
+    credentials:"include",
+    body:JSON.stringify(editUser)
+  })
+  .then(async (res) => {
+    const data = await res.json();
+
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+      navigate("/login", { replace: true });
+      return;
     }
 
-    fetchData();
-  },[]);  
+    if(data.success){  
+      setUsers(users.map(u => u.id === editUser.id ? editUser : u));  
+      setEditUser(null);  
+    } else {
+      alert("Update failed: " + data.error);
+    }
+  })
+  .catch(err => {
+    console.error("Save edit failed:", err);
+    navigate("/login", { replace: true });
+  });
+}  
 
-  function startEdit(user:any){  
-    setEditUser({...user});  
-  }  
+function deleteUser(id:number){  
+  if(!confirm("Delete this user?")) return;  
 
-  function saveEdit(){  
-    fetch(`${API_BASE}/adminUpdateUser`, {
-      method:"PUT",
-      headers:{ "Content-Type":"application/json" },
-      credentials: "include",
-      body:JSON.stringify(editUser)
-    })
-    .then(res=>res.json())
-    .then(data=>{
-      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-        navigate("/login", { replace: true });
-        return;
-      }
+  fetch(`${API_BASE}/adminDeleteUser`, {
+    method:"DELETE",
+    headers:{ "Content-Type":"application/json" },
+    credentials:"include",
+    body:JSON.stringify({id})
+  })
+  .then(async (res) => {
+    const data = await res.json();
 
-      if(data.success){  
-        setUsers(users.map(u => u.id === editUser.id ? editUser : u));  
-        setEditUser(null);  
-      } else {
-        alert("Update failed: " + data.error);
-      }
-    })
-    .catch(err => {
-      console.error("Save edit failed:", err);
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
       navigate("/login", { replace: true });
-    });
-  }  
+      return;
+    }
 
-  function deleteUser(id:number){  
-    if(!confirm("Delete this user?")) return;  
-
-    fetch(`${API_BASE}/adminDeleteUser`, {
-      method:"DELETE",
-      headers:{ "Content-Type":"application/json" },
-      credentials: "include",
-      body:JSON.stringify({id})
-    })
-    .then(res=>res.json())
-    .then(data=>{
-      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      if(data.success){  
-        setUsers(users.filter(u => u.id !== id));  
-      } else {
-        alert("Delete failed: " + data.error);
-      }
-    })
-    .catch(err => {
-      console.error("Delete failed:", err);
-      navigate("/login", { replace: true });
-    });
-  }  
+    if(data.success){  
+      setUsers(users.filter(u => u.id !== id));  
+    } else {
+      alert("Delete failed: " + data.error);
+    }
+  })
+  .catch(err => {
+    console.error("Delete failed:", err);
+    navigate("/login", { replace: true });
+  });
+    }
 
   return(  
     <div className="admin-page">  
