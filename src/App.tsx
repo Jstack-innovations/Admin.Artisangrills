@@ -105,62 +105,63 @@ export default function PaidOrders() {
   
   const renderStat = (value?: number) => <p>{value ?? 0}</p>;
 
-    if (orders.length === 0) {
-      return (
-        <tr>
-          <td colSpan={15}>No orders found</td>
-        </tr>
-      );
-    }
-
-    return orders.map((o) => (
-      <tr key={o.info.order_id}>
-        <td>{o.info.order_id}</td>
-        <td>{o.info.plate_order_no}</td>
-        <td>{o.info.user_id}</td>
-        <td>
-          {o.info.name}
-          <br />
-          {o.info.phone}
-        </td>
-        <td>{o.info.order_type.toUpperCase()}</td>
-        <td>{o.info.table_no || "-"}</td>
-        <td>
-          <div className="order-items">
-            {(o.items || []).map((i, idx) => (
-              <div className="item" key={idx}>
-                <img src={i.image} alt="" />
-                <div>
-                  {i.name} x{i.qty}
-                </div>
-              </div>
-            ))}
-          </div>
-        </td>
-        <td>${parseFloat(o.info.total_amount).toFixed(2)}</td>
-        <td>{o.info.payment_ref}</td>
-        <td>{o.info.status}</td>
-        <td>{o.info.order_status}</td>
-        <td>{o.info.full_address || "-"}</td>
-        <td>{o.info.pickup_time || "-"}</td>
-        <td>{new Date(o.info.created_at).toLocaleString()}</td>
-        <td>
-          <button
-            className="btn"
-            onClick={() => navigate(`/edit-order/${o.info.order_id}`)}
-          >
-            Edit
-          </button>
-          <button
-            className="btn"
-            onClick={() => deleteOrder(o.info.order_id)}
-          >
-            Delete
-          </button>
-        </td>
+    const renderOrders = () => {
+  if (orders.length === 0) {
+    return (
+      <tr>
+        <td colSpan={15}>No orders found</td>
       </tr>
-    ));
-  };
+    );
+  }
+
+  return orders.map((o) => (
+    <tr key={o.info.order_id}>
+      <td>{o.info.order_id}</td>
+      <td>{o.info.plate_order_no}</td>
+      <td>{o.info.user_id}</td>
+      <td>
+        {o.info.name}
+        <br />
+        {o.info.phone}
+      </td>
+      <td>{o.info.order_type.toUpperCase()}</td>
+      <td>{o.info.table_no || "-"}</td>
+      <td>
+        <div className="order-items">
+          {(o.items || []).map((i, idx) => (
+            <div className="item" key={idx}>
+              <img src={i.image} alt="" />
+              <div>
+                {i.name} x{i.qty}
+              </div>
+            </div>
+          ))}
+        </div>
+      </td>
+      <td>${parseFloat(o.info.total_amount).toFixed(2)}</td>
+      <td>{o.info.payment_ref}</td>
+      <td>{o.info.status}</td>
+      <td>{o.info.order_status}</td>
+      <td>{o.info.full_address || "-"}</td>
+      <td>{o.info.pickup_time || "-"}</td>
+      <td>{new Date(o.info.created_at).toLocaleString()}</td>
+      <td>
+        <button
+          className="btn"
+          onClick={() => navigate(`/edit-order/${o.info.order_id}`)}
+        >
+          Edit
+        </button>
+        <button
+          className="btn"
+          onClick={() => deleteOrder(o.info.order_id)}
+        >
+          Delete
+        </button>
+      </td>
+    </tr>
+  ));
+};
 
   return (
     <>
