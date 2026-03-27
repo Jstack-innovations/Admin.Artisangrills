@@ -17,33 +17,29 @@ type Banner = {
 export default function BannerAdmin() {
   const [banner, setBanner] = useState<Banner | null>(null);
   const navigate = useNavigate();
+  
 
+  // ✅ Fetch banner and handle 401
   useEffect(() => {
-    const checkSession = async () => {
+    const fetchBanner = async () => {
       try {
-        const res = await fetch(
-          `${API_BASE}/checkSession`,
-          { credentials: "include" }
-        );
-        const data = await res.json();
+        const res = await fetch(GET_URL, { credentials: "include" });
 
-        if (!data.loggedIn) {
-          navigate("/login");
+        if (res.status === 401) {
+          navigate("/login", { replace: true });
+          return;
         }
+
+        const data = await res.json();
+        setBanner(data);
       } catch (err) {
-        console.error("Session check failed:", err);
-        navigate("/login");
+        console.error("Failed to fetch banner:", err);
+        navigate("/login", { replace: true });
       }
     };
 
-    checkSession();
+    fetchBanner();
   }, [navigate]);
-
-  useEffect(() => {
-    fetch(GET_URL)
-      .then((res) => res.json())
-      .then((data) => setBanner(data));
-  }, []);
 
   const updateAddress = (value: string) => {
     if (!banner) return;
@@ -62,16 +58,29 @@ export default function BannerAdmin() {
     });
   };
 
-  const save = () => {
+  // ✅ Save changes and handle 401
+  const save = async () => {
     if (!banner) return;
 
-    fetch(SAVE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(banner),
-    });
+    try {
+      const res = await fetch(SAVE_URL, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(banner),
+      });
+
+      if (res.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      await res.json();
+      alert("Banner saved!");
+    } catch (err) {
+      console.error("Failed to save banner:", err);
+      navigate("/login", { replace: true });
+    }
   };
 
   if (!banner) return <p>Loading...</p>;
