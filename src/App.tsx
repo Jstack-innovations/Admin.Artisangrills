@@ -177,6 +177,61 @@ export default function PaidOrders() {
 
   return (
     <>
+            <header>
+
+        <div className="brand">
+          ARTISAN <span>GRILLS</span>
+        </div>
+
+        <nav className="nav">
+        <a href="/">All Orders</a>
+        <a href="/tables">Available Tables</a>
+        <a href="/menu">Add Menu</a>
+        <a href="/tax">Set Tax</a>
+        <a href="/check-reservations">View Reservations</a>
+        <a href="/scanner">Scan Artisan Items</a>
+       <a href="/offers">Set Artisanè Offers</a>
+       <a href="/banners">Set Artisanè Banner</a>
+        </nav>
+
+<button
+  className="logout-link"
+  onClick={() => navigate("/logout")}
+  style={{
+    all: "unset",          // remove default button styles
+    cursor: "pointer",     // pointer on hover
+    display: "flex",       // keep the flex if you want icon + text
+    alignItems: "center",
+    gap: "6px",
+  }}
+>
+  <span className="logout-icon">⎋</span> Logout
+</button>
+
+        <button
+          className={`hamburger ${menuOpen ? "active" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+      </header>
+
+      <div className={`mobile-menu ${menuOpen ? "" : "hidden"}`}>
+        <a href="/">All Orders</a>
+        <a href="/users">Active Users</a>
+        <a href="/tables">Available Tables</a>
+        <a href="/menu">Add Menu</a>
+        <a href="/tax">Set Tax</a>
+        <a href="/check-reservations">View Reservations</a>
+       <a href="/scanner">Scan Artisan Items</a>
+       <a href="/offers">Set Artisanè Offers</a>
+       <a href="/banners">Set Artisanè Banner</a>
+      </div>
+
+      
       <div className="wrapper">
         <h2>Paid Orders</h2>
 
