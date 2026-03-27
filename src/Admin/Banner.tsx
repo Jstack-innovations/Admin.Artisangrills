@@ -19,28 +19,11 @@ export default function BannerAdmin() {
   const navigate = useNavigate();
 
 
-
-  // ✅ Fetch banner and handle 401
   useEffect(() => {
-    const fetchBanner = async () => {
-      try {
-        const res = await fetch(GET_URL, { credentials: "include" });
-
-        if (res.status === 401) {
-          navigate("/login", { replace: true });
-          return;
-        }
-
-        const data = await res.json();
-        setBanner(data);
-      } catch (err) {
-        console.error("Failed to fetch banner:", err);
-        navigate("/login", { replace: true });
-      }
-    };
-
-    fetchBanner();
-  }, [navigate]);
+    fetch(GET_URL)
+      .then((res) => res.json())
+      .then((data) => setBanner(data));
+  }, []);
 
   const updateAddress = (value: string) => {
     if (!banner) return;
@@ -59,29 +42,16 @@ export default function BannerAdmin() {
     });
   };
 
-  // ✅ Save changes and handle 401
-  const save = async () => {
+  const save = () => {
     if (!banner) return;
 
-    try {
-      const res = await fetch(SAVE_URL, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(banner),
-      });
-
-      if (res.status === 401) {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      await res.json();
-      alert("Banner saved!");
-    } catch (err) {
-      console.error("Failed to save banner:", err);
-      navigate("/login", { replace: true });
-    }
+    fetch(SAVE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(banner),
+    });
   };
 
   if (!banner) return <p>Loading...</p>;
