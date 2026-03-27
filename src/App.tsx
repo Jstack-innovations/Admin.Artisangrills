@@ -45,6 +45,9 @@ export default function PaidOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<Stats>({});
   const [authChecked, setAuthChecked] = useState(false);
+  
+  // ✅ This fixes your TS errors for hamburger menu
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -72,6 +75,7 @@ export default function PaidOrders() {
 
     checkAuth();
   }, [navigate]);
+  
 
   const deleteOrder = async (id: number) => {
     if (!confirm("Delete this order?")) return;
