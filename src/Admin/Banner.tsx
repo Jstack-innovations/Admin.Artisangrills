@@ -20,24 +20,35 @@ export default function BannerAdmin() {
 
   // ✅ Fetch banner and let backend respond 401 if not logged in
   useEffect(() => {
-    const fetchBanner = async () => {
-      try {
-        const res = await fetch(GET_URL, { credentials: "include" });
+  useEffect(() => {
+  const fetchBanner = async () => {
+    try {
+      const res = await fetch(GET_URL, {
+        credentials: "include",
+      });
 
-        if (res.status === 401) {
-          navigate("/login", { replace: true });
-          return;
-        }
+      const data = await res.json();
 
-        const data = await res.json();
-        setBanner(data);
-      } catch (err) {
-        console.error("Failed to fetch banner:", err);
+      // Same style as AddOrder
+      if (
+        res.status === 401 ||
+        data.error === "Unauthorized" ||
+        data.error === "Session expired"
+      ) {
+        navigate("/login");
+        return;
       }
-    };
 
-    fetchBanner();
-  }, [navigate]);
+      setBanner(data);
+    } catch (err) {
+      console.error("Failed to fetch banner:", err);
+    }
+  };
+
+  fetchBanner();
+}, [navigate]);
+
+    
 
   const updateAddress = (value: string) => {
     if (!banner) return;
