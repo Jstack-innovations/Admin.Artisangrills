@@ -18,18 +18,29 @@ export default function BannerAdmin() {
   const [banner, setBanner] = useState<Banner | null>(null);
   const navigate = useNavigate();
 
-  // ✅ Fetch banner and let backend return 401 if not logged in
+  // Fetch banner
   useEffect(() => {
-    fetch(GET_URL)
-      .then((res) => res.json())
-      .then((data) => setBanner(data));
+    const fetchBanner = async () => {
+      try {
+        const res = await fetch(GET_URL);
+        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+
+        const data: Banner = await res.json(); // make sure backend returns correct shape
+        setBanner(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchBanner();
   }, []);
 
-  const updateAddress = (value) => {
+  const updateAddress = (value: string) => {
+    if (!banner) return; // null check
     setBanner({ ...banner, address: value });
   };
 
-  const updateDiscount = (key, value) => {
+  const updateDiscount = (key: keyof Banner["discount"], value: string) => {
+    if (!banner) return; // null check
     setBanner({
       ...banner,
       discount: {
@@ -38,19 +49,15 @@ export default function BannerAdmin() {
       },
     });
   };
-  
 
-  // ✅ Save and let backend return 401 if session expired
   const save = async () => {
     if (!banner) return;
 
     try {
       const res = await fetch(SAVE_URL, {
         method: "POST",
-        credentials: "include", // IMPORTANT
-        headers: {
-          "Content-Type": "application/json",
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(banner),
       });
 
@@ -67,7 +74,7 @@ export default function BannerAdmin() {
 
       alert("Banner saved!");
     } catch (err) {
-      console.error("Failed to save banner:", err);
+      console.error(err);
     }
   };
 
@@ -91,7 +98,6 @@ export default function BannerAdmin() {
           onChange={(e) => updateDiscount("title", e.target.value)}
           placeholder="Discount Title"
         />
-
         <input
           value={banner.discount.subtitle}
           onChange={(e) => updateDiscount("subtitle", e.target.value)}
