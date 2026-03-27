@@ -42,103 +42,182 @@ export default function MenuPage() {
     fetchMenu();
   }, []);
 
-  // ✅ Guarded Add
+  // Add guarded
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "add",
-          category: form.category,
-          name: form.name,
-          description: form.description,
-          price: form.price,
-          image: form.image,
-          tags: form.tags.split(","),
-          badge: form.badge,
-          available: form.available === "1",
-        }),
-      });
-      const data = await res.json();
-      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-        navigate("/login", { replace: true });
-        return;
-      }
-      fetchMenu();
-    } catch (err) {
-      console.error("Add failed:", err);
+    const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "add",
+        category: form.category,
+        name: form.name,
+        description: form.description,
+        price: form.price,
+        image: form.image,
+        tags: form.tags.split(","),
+        badge: form.badge,
+        available: form.available === "1",
+      }),
+    });
+    const data = await res.json();
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+      navigate("/login", { replace: true });
+      return;
     }
+    fetchMenu();
   };
 
-  // ✅ Guarded Update
+  // Update guarded
   const handleUpdate = async (category: string, item: MenuItem) => {
-    try {
-      const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "update",
-          category,
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          image: item.image,
-          tags: item.tags,
-          badge: item.badge,
-          available: item.available,
-        }),
-      });
-      const data = await res.json();
-      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-        navigate("/login", { replace: true });
-        return;
-      }
-      fetchMenu();
-    } catch (err) {
-      console.error("Update failed:", err);
+    const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "update",
+        category,
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        image: item.image,
+        tags: item.tags,
+        badge: item.badge,
+        available: item.available,
+      }),
+    });
+    const data = await res.json();
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+      navigate("/login", { replace: true });
+      return;
     }
+    fetchMenu();
   };
 
-  // ✅ Guarded Delete
+  // Delete guarded
   const handleDelete = async (category: string, id: number) => {
-    try {
-      const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "delete",
-          category,
-          id,
-        }),
-      });
-      const data = await res.json();
-      if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-        navigate("/login", { replace: true });
-        return;
-      }
-      fetchMenu();
-    } catch (err) {
-      console.error("Delete failed:", err);
+    const res = await fetch(`${API_BASE}/adminUpdateMemu`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "delete",
+        category,
+        id,
+      }),
+    });
+    const data = await res.json();
+    if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
+      navigate("/login", { replace: true });
+      return;
     }
+    fetchMenu();
   };
 
   return (
     <div className="menu-page">
-      {/* Header, mobile menu, and add form remain the same */}
-      {/* ... */}
+      <header>
+        <div className="brand">
+          ARTISAN <span>GRILLS</span>
+        </div>
+        <nav className="nav">
+          <a href="/">All Orders</a>
+          <a href="/tables">Available Tables</a>
+          <a href="/menu">Add Menu</a>
+          <a href="/tax">Set Tax</a>
+          <a href="/check-reservations">View Reservations</a>
+        </nav>
+        <button
+          className={`hamburger ${hamburgerActive ? "active" : ""}`}
+          onClick={() => setHamburgerActive(!hamburgerActive)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </header>
+
+      <div className={`mobile-menu ${hamburgerActive ? "" : "hidden"}`}>
+        <a href="/">All Orders</a>
+        <a href="/tables">Available Tables</a>
+        <a href="/menu">Add Menu</a>
+        <a href="/tax">Set Tax</a>
+        <a href="/check-reservations">View Reservations</a>
+      </div>
 
       <div className="container">
         <div className="add-form">
           <h2>Add New Menu Item</h2>
           <form onSubmit={handleAdd}>
-            {/* form fields unchanged */}
-            <button className="btn" type="submit">Add Item</button>
+            <input type="hidden" name="action" value="add" />
+            <div className="form-row">
+              <select
+                required
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+              >
+                <option value="">Select Category</option>
+                {Object.keys(menu).map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </option>
+                ))}
+              </select>
+              <input
+                placeholder="Item Name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="form-row">
+              <input
+                placeholder="Price"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
+                required
+              />
+              <input
+                placeholder="Badge (optional)"
+                value={form.badge}
+                onChange={(e) => setForm({ ...form, badge: e.target.value })}
+              />
+            </div>
+
+            <div className="form-row">
+              <input
+                placeholder="Image URL"
+                value={form.image}
+                onChange={(e) => setForm({ ...form, image: e.target.value })}
+                required
+              />
+              <input
+                placeholder="Tags (comma separated)"
+                value={form.tags}
+                onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="form-rowT">
+              <input
+                placeholder="Description"
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                required
+              />
+              <select
+                value={form.available}
+                onChange={(e) => setForm({ ...form, available: e.target.value })}
+              >
+                <option value="1">Available</option>
+                <option value="0">Not Available</option>
+              </select>
+            </div>
+
+            <button className="btn" type="submit">
+              Add Item
+            </button>
           </form>
         </div>
 
@@ -148,7 +227,76 @@ export default function MenuPage() {
             <div className="grid">
               {items.map((item) => (
                 <div key={item.id} className="card">
-                  {/* item display fields unchanged */}
+                  <img src={item.image} alt={item.name} />
+                  <h3>{item.name}</h3>
+                  <p>{item.description}</p>
+                  <p><strong>Price:</strong> ${item.price}</p>
+                  <p><strong>Tags:</strong> {item.tags.join(", ")}</p>
+                  <p><strong>Badge:</strong> {item.badge ?? "—"}</p>
+                  <p><strong>Available:</strong> {item.available ? "Yes" : "No"}</p>
+
+                  {/* Editable fields */}
+                  <div className="form-row">
+                    <input
+                      value={item.name}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, name: e.target.value } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                    <input
+                      type="number"
+                      value={item.price}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, price: parseFloat(e.target.value) } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <input
+                      value={item.image}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, image: e.target.value } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                    <input
+                      value={item.badge ?? ""}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, badge: e.target.value } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <input
+                      value={item.description}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, description: e.target.value } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                    <input
+                      value={item.tags.join(", ")}
+                      onChange={(e) => {
+                        const newItems = menu[category].map((i) =>
+                          i.id === item.id ? { ...i, tags: e.target.value.split(",") } : i
+                        );
+                        setMenu({ ...menu, [category]: newItems });
+                      }}
+                    />
+                  </div>
                   <div className="form-rowT">
                     <select
                       value={item.available ? "1" : "0"}
@@ -162,9 +310,19 @@ export default function MenuPage() {
                       <option value="1">Available</option>
                       <option value="0">Not Available</option>
                     </select>
-                    <button className="btn" onClick={() => handleUpdate(category, item)}>Update</button>
+                    <button
+                      className="btn"
+                      onClick={() => handleUpdate(category, item)}
+                    >
+                      Update
+                    </button>
                   </div>
-                  <button className="btn" onClick={() => handleDelete(category, item.id)}>Delete</button>
+                  <button
+                    className="btn"
+                    onClick={() => handleDelete(category, item.id)}
+                  >
+                    Delete
+                  </button>
                 </div>
               ))}
             </div>
