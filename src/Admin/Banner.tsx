@@ -18,12 +18,33 @@ export default function BannerAdmin() {
   const [banner, setBanner] = useState<Banner | null>(null);
   const navigate = useNavigate();
 
-
+  // ✅ Fetch banner and let backend return 401 if not logged in
   useEffect(() => {
-    fetch(GET_URL)
-      .then((res) => res.json())
-      .then((data) => setBanner(data));
-  }, []);
+    const fetchBanner = async () => {
+      try {
+        const res = await fetch(GET_URL, {
+          credentials: "include", // IMPORTANT for session cookie
+        });
+
+        const data = await res.json();
+
+        if (
+          res.status === 401 ||
+          data.error === "Unauthorized" ||
+          data.error === "Session expired"
+        ) {
+          navigate("/login");
+          return;
+        }
+
+        setBanner(data);
+      } catch (err) {
+        console.error("Failed to fetch banner:", err);
+      }
+    };
+
+    fetchBanner();
+  }, [navigate]);
 
   const updateAddress = (value: string) => {
     if (!banner) return;
@@ -42,16 +63,35 @@ export default function BannerAdmin() {
     });
   };
 
-  const save = () => {
+  // ✅ Save and let backend return 401 if session expired
+  const save = async () => {
     if (!banner) return;
 
-    fetch(SAVE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(banner),
-    });
+    try {
+      const res = await fetch(SAVE_URL, {
+        method: "POST",
+        credentials: "include", // IMPORTANT
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(banner),
+      });
+
+      const data = await res.json();
+
+      if (
+        res.status === 401 ||
+        data.error === "Unauthorized" ||
+        data.error === "Session expired"
+      ) {
+        navigate("/login");
+        return;
+      }
+
+      alert("Banner saved!");
+    } catch (err) {
+      console.error("Failed to save banner:", err);
+    }
   };
 
   if (!banner) return <p>Loading...</p>;
