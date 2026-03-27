@@ -18,38 +18,53 @@ export default function OffersAdmin() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const navigate = useNavigate();
 
+  // ✅ GET is free
   useEffect(() => {
     fetch(GET_URL)
       .then((res) => res.json())
-      .then((data) => setOffers(data));
+      .then((data: Offer[]) => setOffers(data))
+      .catch((err) => console.error("Failed to fetch offers:", err));
   }, []);
 
   const update = (i: number, key: keyof Offer, value: string) => {
     const copy = [...offers];
-    copy[i] = {
-      ...copy[i],
-      [key]: value,
-    };
+    copy[i] = { ...copy[i], [key]: value };
     setOffers(copy);
   };
 
   const add = () => {
-    setOffers([
-      ...offers,
-      { title: "", main: "", sub: "", bg: "#fff", image: "" },
-    ]);
+    setOffers([...offers, { title: "", main: "", sub: "", bg: "#fff", image: "" }]);
   };
 
   const remove = (i: number) => {
     setOffers(offers.filter((_, index) => index !== i));
   };
 
-  const save = () => {
-    fetch(SAVE_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(offers),
-    });
+  // ✅ Only SAVE is guarded
+  const save = async () => {
+    try {
+      const res = await fetch(SAVE_URL, {
+        method: "POST",
+        credentials: "include", // send session cookie
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(offers),
+      });
+
+      const data = await res.json();
+
+      if (
+        res.status === 401 ||
+        data.error === "Unauthorized" ||
+        data.error === "Session expired"
+      ) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      alert("Offers saved!");
+    } catch (err) {
+      console.error("Failed to save offers:", err);
+    }
   };
 
   return (
@@ -63,31 +78,26 @@ export default function OffersAdmin() {
             placeholder="Title"
             onChange={(e) => update(i, "title", e.target.value)}
           />
-
           <input
             value={o.main}
             placeholder="Main"
             onChange={(e) => update(i, "main", e.target.value)}
           />
-
           <input
             value={o.sub}
             placeholder="Sub"
             onChange={(e) => update(i, "sub", e.target.value)}
           />
-
           <input
             value={o.bg}
             placeholder="BG Color"
             onChange={(e) => update(i, "bg", e.target.value)}
           />
-
           <input
             value={o.image}
             placeholder="Image URL"
             onChange={(e) => update(i, "image", e.target.value)}
           />
-
           <button className="delete" onClick={() => remove(i)}>
             Delete
           </button>
@@ -102,4 +112,4 @@ export default function OffersAdmin() {
       </div>
     </div>
   );
-            }
+}
