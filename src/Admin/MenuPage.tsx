@@ -44,6 +44,10 @@ export default function MenuPage() {
   setMenu(data.menu);
 };
 
+  useEffect(() => {
+  fetchMenu();
+}, []);
+
 const handleAdd = async (e: React.FormEvent) => {
   e.preventDefault();
   const res = await fetch(`${API_BASE}/adminUpdateMenu`, {
