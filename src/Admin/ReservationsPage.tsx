@@ -26,27 +26,6 @@ export default function ReservationsPage() {
   const navigate = useNavigate();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [tables, setTables] = useState<Table[]>([]);
-  
-  useEffect(() => {
-  const checkSession = async () => {
-    try {
-      const res = await fetch(
-                `${API_BASE}/checkSession`,
-        { credentials: "include" } // include cookies
-      );
-      const data = await res.json();
-
-      if (!data.loggedIn) {
-        navigate("/login"); // redirect to login if no session
-      }
-    } catch (err) {
-      console.error("Session check failed:", err);
-      navigate("/login");
-    }
-  };
-
-  checkSession();
-}, [navigate]);
 
   // Fetch data from PHP API
   const fetchReservations = async () => {
