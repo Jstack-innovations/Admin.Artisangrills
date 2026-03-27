@@ -19,26 +19,6 @@ export default function Tables() {
   const [tables, setTables] = useState<Table[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // ---- SESSION CHECK ----
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/checkSession`, {
-          credentials: "include", // send session cookie
-        });
-        const data = await res.json();
-
-        if (!data.loggedIn) {
-          navigate("/login", { replace: true });
-        }
-      } catch (err) {
-        console.error("Session check failed:", err);
-        navigate("/login", { replace: true });
-      }
-    };
-
-    checkSession();
-  }, [navigate]);
 
   // ---- FETCH TABLES ----
   const fetchTables = async () => {
