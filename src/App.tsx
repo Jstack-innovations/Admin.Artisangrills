@@ -44,37 +44,34 @@ export default function PaidOrders() {
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<Stats>({});
-  const [authChecked, setAuthChecked] = useState(false);
   
   // ✅ This fixes your TS errors for hamburger menu
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/getOrder`, {
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
+  const checkAuth = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/getOrder`, {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
 
-        if (res.status === 401) {
-          navigate("/login", { replace: true });
-          return;
-        }
-
-        const data = await res.json();
-        setOrders(Object.values(data.orders || {}));
-        setStats(data.stats || {});
-      } catch (err) {
-        console.error(err);
+      if (res.status === 401) {
         navigate("/login", { replace: true });
-      } finally {
-        setAuthChecked(true);
+        return;
       }
-    };
 
-    checkAuth();
-  }, [navigate]);
+      const data = await res.json();
+      setOrders(Object.values(data.orders || {}));
+      setStats(data.stats || {});
+    } catch (err) {
+      console.error(err);
+      navigate("/login", { replace: true });
+    }
+  };
+
+  checkAuth();
+}, [navigate]);
   
 
   const deleteOrder = async (id: number) => {
