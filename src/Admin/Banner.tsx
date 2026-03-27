@@ -22,7 +22,7 @@ export default function BannerAdmin() {
   useEffect(() => {
     const fetchBanner = async () => {
       try {
-        const res = await fetch(GET_URL);
+        const res = await fetch(GET_URL, { credentials: "include" });
         if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
 
         const data: Banner = await res.json(); // make sure backend returns correct shape
