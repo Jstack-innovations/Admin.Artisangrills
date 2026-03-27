@@ -30,27 +30,6 @@ export default function MenuPage() {
     available: "1",
   });
   const [hamburgerActive, setHamburgerActive] = useState(false);
-  
-  useEffect(() => {
-  const checkSession = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/checkSession`,
-        { credentials: "include" } // include cookies
-      );
-      const data = await res.json();
-
-      if (!data.loggedIn) {
-        navigate("/login"); // redirect to login if no session
-      }
-    } catch (err) {
-      console.error("Session check failed:", err);
-      navigate("/login");
-    }
-  };
-
-  checkSession();
-}, [navigate]);
 
   const fetchMenu = async () => {
     const res = await fetch(
