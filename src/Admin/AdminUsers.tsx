@@ -10,33 +10,6 @@ export default function AdminUsers(){
   const [verifications,setVerifications] = useState<any[]>([]);    
   const [editUser,setEditUser] = useState<any>(null);    
     
-  useEffect(() => {    
-    const checkSession = async () => {    
-      try {    
-        const res = await fetch(    
-               `${API_BASE}/checkSession`,    
-          { credentials: "include" } // include cookies    
-        );    
-        const data = await res.json();    
-    
-        if (res.status === 401 || data.error === "Unauthorized" || data.error === "Session expired") {
-          navigate("/login", { replace: true });
-          return;
-        }
-
-        if (!data.loggedIn) {    
-          navigate("/login"); // redirect to login if no session    
-        }    
-      } catch (err) {    
-        console.error("Session check failed:", err);    
-        navigate("/login");    
-      }    
-    };    
-    
-    checkSession();    
-  }, [navigate]);    
-    
-    
     
   const API = `${API_BASE}/UandV`;    
     
