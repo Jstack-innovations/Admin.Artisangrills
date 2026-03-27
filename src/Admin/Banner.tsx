@@ -20,7 +20,6 @@ export default function BannerAdmin() {
 
   // ✅ Fetch banner and let backend respond 401 if not logged in
   useEffect(() => {
-  useEffect(() => {
   const fetchBanner = async () => {
     try {
       const res = await fetch(GET_URL, {
