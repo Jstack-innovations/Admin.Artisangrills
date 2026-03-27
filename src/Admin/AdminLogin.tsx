@@ -36,15 +36,12 @@ export default function Login() {
 
     try{
 
-      const res = await fetch(
-        `${API_BASE}/adminLogin`,
-        {
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
-          body:JSON.stringify({email,password}),
-          credentials:"include"
-        }
-      );
+      const res = await fetch(`${API_BASE}/adminLogin`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, password }),
+  credentials: "include" // must be include for cookies
+});
 
       const data = await res.json();
       console.log("Login response:",data);
